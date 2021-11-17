@@ -2,6 +2,14 @@
 
 xcov_files=$(find . -type f -name '*.xcov')
 
+# We simulate partial coverage by using the gcov branch coverage output. The
+# percentage value are fixed and does not represent actual coverage of the
+# branch...
+partial_cov="\nbranch 0 taken 100%\nbranch 1 taken 0%"
+
+
+# XCOV coverage state symbols:
+#
 #   State_Char : constant State_Char_Array :=
 #     (No_Code                 => '.',
 #      Not_Coverable           => '0',
@@ -12,13 +20,13 @@ xcov_files=$(find . -type f -name '*.xcov')
 #      Exempted_No_Violation   => '#');
 
 sed_rules=""
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) \.:/     -: \1:/g;" # not coverable
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) 0:/     -: \1:/g;"  # not coverable
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) -:/ #####: \1:/g;"  # not covered
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) \!:/ #####: \1:/g;" # not covered
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) +:/     1: \1:/g;"  # covered
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) \*:/     -: \1:/g;" # not coverable
-sed_rules="${sed_rules} s/\([[:digit:]]\+\) #:/     -: \1:/g;"  # not coverable
+sed_rules="${sed_rules} s/\([[:digit:]]\+\) \.:\(.*$\)/     -: \1:\2/g;" # not coverable
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) 0:\(.*$\)/     -: \1:\2/g;"  # not coverable
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) -:\(.*$\)/ #####: \1:\2/g;"  # not covered
+sed_rules="${sed_rules} s/\([[:digit:]]\+\) \!:\(.*$\)/     1: \1:\2${partial_cov}/g;" # partially covered
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) +:\(.*$\)/     1: \1:\2/g;"  # covered
+sed_rules="${sed_rules} s/\([[:digit:]]\+\) \*:\(.*$\)/     -: \1:\2/g;" # not coverable
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) #:\(.*$\)/     -: \1:\2/g;"  # not coverable
 
 gnatcov_header_lines=6
 
