@@ -32,7 +32,7 @@ locate_src () {
         >&2 echo "WARNING: Source file not found"
         return 1
     elif [ ${find_cnt} -ne 1 ]; then
-        >&2 echo "ERROR: More than one sources with same filename"
+        >&2 echo "ERROR: More than one source file: " ${find_out}
         return 1
     else
         echo ${find_out}
