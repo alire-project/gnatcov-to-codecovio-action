@@ -1,0 +1,27 @@
+name: 'GNATcov to codecov.io'
+description: 'Upload coverage results from gnatcov to codecov.io'
+inputs:
+  token:
+    description: 'Repository upload token - get it from codecov.io. Required only for private repositories'
+    required: false
+  fail_ci_if_error:
+    description: 'Specify whether or not CI build should fail if Codecov runs into an error during upload'
+    required: false
+  verbose:
+    description: 'Specify whether the Codecov output should be verbose'
+    required: false
+branding:
+  color: 'red'
+  icon: 'umbrella'
+runs:
+  using: "composite"
+  steps:
+    - name: Convert .xcov files to .gcov
+      run: ${{ github.action_path }}/xcov2gcov.sh
+      shell: bash
+
+    - uses: codecov/codecov-action@v2
+      with:
+        token: ${{ inputs.token }}
+        verbose: ${{ inputs.verbose }}
+        fail_ci_if_error: ${{ inputs.fail_ci_if_error }}
