@@ -1,12 +1,9 @@
-#!/bin/sh
-
-xcov_files=$(find . -type f -name '*.xcov')
+#!/bin/bash
 
 # We simulate partial coverage by using the gcov branch coverage output. The
 # percentage value are fixed and does not represent actual coverage of the
 # branch...
 partial_cov="\nbranch 0 taken 100%\nbranch 1 taken 0%"
-
 
 # XCOV coverage state symbols:
 #
@@ -30,7 +27,8 @@ sed_rules="${sed_rules}  s/\([[:digit:]]\+\) #:\(.*$\)/     -: \1:\2/g;"  # not 
 
 gnatcov_header_lines=6
 
-for file in ${xcov_files}; do
+IFS=$'\n'
+for file in $(find . -type f -name '*.xcov'); do
     echo "Input file:" $file
     src_basename="$(basename -- ${file%.xcov})"
     src_file=$(cat ${file} | head -1 | cut -d: -f1)
@@ -43,3 +41,4 @@ for file in ${xcov_files}; do
     echo "        -: 0:Runs:1" >> ${gcov_file}
     tail -n +${gnatcov_header_lines} ${file} | sed "${sed_rules}" >> ${gcov_file}
 done
+unset IFS
