@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # We simulate partial coverage by using the gcov branch coverage output. The
-# percentage value are fixed and does not represent actual coverage of the
+# percentage values are fixed and do not represent actual coverage of the
 # branch...
 partial_cov="\nbranch 0 taken 100%\nbranch 1 taken 0%"
 
@@ -18,12 +18,12 @@ partial_cov="\nbranch 0 taken 100%\nbranch 1 taken 0%"
 
 sed_rules=""
 sed_rules="${sed_rules} s/\([[:digit:]]\+\) \.:\(.*$\)/     -: \1:\2/g;" # not coverable
-sed_rules="${sed_rules}  s/\([[:digit:]]\+\) 0:\(.*$\)/     -: \1:\2/g;"  # not coverable
-sed_rules="${sed_rules}  s/\([[:digit:]]\+\) -:\(.*$\)/ #####: \1:\2/g;"  # not covered
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) 0:\(.*$\)/     -: \1:\2/g;" # not coverable
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) -:\(.*$\)/ #####: \1:\2/g;" # not covered
 sed_rules="${sed_rules} s/\([[:digit:]]\+\) \!:\(.*$\)/     1: \1:\2${partial_cov}/g;" # partially covered
-sed_rules="${sed_rules}  s/\([[:digit:]]\+\) +:\(.*$\)/     1: \1:\2/g;"  # covered
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) +:\(.*$\)/     1: \1:\2/g;" # covered
 sed_rules="${sed_rules} s/\([[:digit:]]\+\) \*:\(.*$\)/     -: \1:\2/g;" # not coverable
-sed_rules="${sed_rules}  s/\([[:digit:]]\+\) #:\(.*$\)/     -: \1:\2/g;"  # not coverable
+sed_rules="${sed_rules}  s/\([[:digit:]]\+\) #:\(.*$\)/     -: \1:\2/g;" # not coverable
 
 gnatcov_header_lines=6
 
@@ -42,3 +42,4 @@ for file in $(find . -type f -name '*.xcov'); do
     tail -n +${gnatcov_header_lines} ${file} | sed "${sed_rules}" >> ${gcov_file}
 done
 unset IFS
+s
