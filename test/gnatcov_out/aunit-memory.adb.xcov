@@ -1,0 +1,63 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/nativememory/aunit-memory.adb:
+0% of 2 lines covered
+0% statement coverage (0 out of 2)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT RUN-TIME COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                          A U N I T . M E M O R Y                         --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --          Copyright (C) 2001-2003 Free Software Foundation, Inc.          --
+  10 .: --                     Copyright (C) 2008-2011, AdaCore                     --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: --  Memory allocation implementation using the gnat runtime methods.
+  33 .: 
+  34 .: package body AUnit.Memory is
+  35 .: 
+  36 .:    -----------
+  37 .:    -- Alloc --
+  38 .:    -----------
+  39 .: 
+  40 .:    function AUnit_Alloc (Size : size_t) return System.Address is
+  41 .:       function RT_Malloc (Size : size_t) return System.Address;
+  42 .:       pragma Import (C, RT_Malloc, "__gnat_malloc");
+  43 .:    begin
+  44 -:       return RT_Malloc (Size);
+  45 .:    end AUnit_Alloc;
+  46 .: 
+  47 .:    ----------
+  48 .:    -- Free --
+  49 .:    ----------
+  50 .: 
+  51 .:    procedure AUnit_Free (Obj : System.Address) is
+  52 .:       procedure RT_Free (Obj : System.Address);
+  53 .:       pragma Import (C, RT_Free, "__gnat_free");
+  54 .:    begin
+  55 -:       RT_Free (Obj);
+  56 .:    end AUnit_Free;
+  57 .: 
+  58 .: end AUnit.Memory;

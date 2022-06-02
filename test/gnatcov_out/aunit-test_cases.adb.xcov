@@ -1,0 +1,179 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-test_cases.adb:
+0% of 39 lines covered
+0% statement coverage (0 out of 39)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                      A U N I T . T E S T _ C A S E S                     --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                       Copyright (C) 2000-2019, AdaCore                   --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: with Ada.Unchecked_Conversion;
+  33 .: with AUnit.Options;              use AUnit.Options;
+  34 .: with AUnit.Test_Filters;         use AUnit.Test_Filters;
+  35 .: with AUnit.Time_Measure;
+  36 .: 
+  37 .: package body AUnit.Test_Cases is
+  38 .: 
+  39 .:    package body Registration is separate;
+  40 .: 
+  41 .:    -----------------
+  42 .:    -- Add_Routine --
+  43 .:    -----------------
+  44 .: 
+  45 .:    procedure Add_Routine (T : in out Test_Case'Class; Val : Routine_Spec) is
+  46 .:    begin
+  47 -:       Routine_Lists.Append (T.Routines, Val);
+  48 .:    end Add_Routine;
+  49 .: 
+  50 .:    --------------
+  51 .:    -- Run_Test --
+  52 .:    --------------
+  53 .: 
+  54 .:    procedure Run_Test (Test : in out Test_Case) is
+  55 .:    begin
+  56 -:       Test.Routine.Routine (Test);
+  57 .:    end Run_Test;
+  58 .: 
+  59 .:    ----------------------
+  60 .:    -- Call_Set_Up_Case --
+  61 .:    ----------------------
+  62 .: 
+  63 .:    function Call_Set_Up_Case
+  64 .:      (Test : in out Test_Case'Class) return Test_Error_Access is separate;
+  65 .: 
+  66 .:    ---------
+  67 .:    -- Run --
+  68 .:    ---------
+  69 .: 
+  70 .:    procedure Run
+  71 .:      (Test    : access Test_Case;
+  72 .:       Options :        AUnit.Options.AUnit_Options;
+  73 .:       R       : in out Result'Class;
+  74 .:       Outcome :    out Status)
+  75 .:    is
+  76 .:       use Routine_Lists;
+  77 -:       Result : Status;
+  78 -:       C      : Cursor;
+  79 -:       Set_Up_Case_Called : Boolean := False;
+  80 -:       Error              : Test_Error_Access := null;
+  81 .:    begin
+  82 -:       Outcome := Success;
+  83 -:       Routine_Lists.Clear (Test.Routines);
+  84 -:       Register_Tests (Test_Case'Class (Test.all));
+  85 .: 
+  86 -:       C := First (Test.Routines);
+  87 .: 
+  88 -:       while Has_Element (C) loop
+  89 -:          Test.Routine := Element (C);
+  90 -:          if Options.Filter = null
+  91 -:            or else Is_Active (Options.Filter.all, Test.all)
+  92 .:          then
+  93 -:             if not Set_Up_Case_Called then
+  94 -:                Set_Up_Case_Called := True;
+  95 -:                Error := Call_Set_Up_Case (Test_Case'Class (Test.all));
+  96 .:             end if;
+  97 .: 
+  98 -:             if Error = null then
+  99 -:                AUnit.Simple_Test_Cases.Run
+ 100 -:                  (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
+ 101 -:                   Options, R, Result);
+ 102 .: 
+ 103 -:                if Result = Failure then
+ 104 -:                   Outcome := Failure;
+ 105 .:                end if;
+ 106 .:             else
+ 107 -:                Outcome := Failure;
+ 108 -:                Add_Error (R, Name (Test_Case'Class (Test.all)),
+ 109 -:                           Routine_Name (Test.all), Error.all,
+ 110 -:                           Time_Measure.Null_Time);
+ 111 .:             end if;
+ 112 .:          end if;
+ 113 .: 
+ 114 -:          Next (C);
+ 115 .:       end loop;
+ 116 .: 
+ 117 -:       if Set_Up_Case_Called then
+ 118 -:          Tear_Down_Case (Test_Case'Class (Test.all));
+ 119 .:       end if;
+ 120 .:    end Run;
+ 121 .: 
+ 122 .:    ------------------
+ 123 .:    -- Routine_Name --
+ 124 .:    ------------------
+ 125 .: 
+ 126 .:    function Routine_Name (Test : Test_Case) return Message_String is
+ 127 .:    begin
+ 128 -:       return Test.Routine.Routine_Name;
+ 129 .:    end Routine_Name;
+ 130 .: 
+ 131 .:    ------------------
+ 132 .:    --  Set_Up_Case --
+ 133 .:    ------------------
+ 134 .: 
+ 135 .:    procedure Set_Up_Case (Test : in out Test_Case) is
+ 136 .:       --  Default
+ 137 .:       pragma Unreferenced (Test);
+ 138 .:    begin
+ 139 -:       null;
+ 140 .:    end Set_Up_Case;
+ 141 .: 
+ 142 .:    --------------------
+ 143 .:    -- Tear_Down_Case --
+ 144 .:    --------------------
+ 145 .: 
+ 146 .:    procedure Tear_Down_Case (Test : in out Test_Case) is
+ 147 .:       pragma Unreferenced (Test);
+ 148 .:    begin
+ 149 -:       null;
+ 150 .:    end Tear_Down_Case;
+ 151 .: 
+ 152 .:    package body Specific_Test_Case_Registration is
+ 153 .: 
+ 154 .:       ----------------------
+ 155 .:       -- Register_Wrapper --
+ 156 .:       ----------------------
+ 157 .: 
+ 158 .:       procedure Register_Wrapper
+ 159 .:         (Test    : in out Specific_Test_Case'Class;
+ 160 .:          Routine : Specific_Test_Routine;
+ 161 .:          Name    : String)
+ 162 .:       is
+ 163 -:          function Conv is
+ 164 -:             new Ada.Unchecked_Conversion (Specific_Test_Routine, Test_Routine);
+ 165 .:       begin
+ 166 -:          Registration.Register_Routine
+ 167 -:            (Test_Case'Class (Test),
+ 168 -:             Conv (Routine),
+ 169 -:             Name);
+ 170 .:       end Register_Wrapper;
+ 171 .: 
+ 172 .:    end Specific_Test_Case_Registration;
+ 173 .: 
+ 174 .: end AUnit.Test_Cases;

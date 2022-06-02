@@ -1,0 +1,1574 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/containers/ada_containers-aunit_lists.adb:
+0% of 540 lines covered
+0% statement coverage (0 out of 540)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT LIBRARY COMPONENTS                          --
+   4 .: --                                                                          --
+   5 .: --            A D A _ C O N T A I N E R S . A U N I T _ L I S T S           --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --          Copyright (C) 2004-2007, Free Software Foundation, Inc.         --
+  10 .: --                   Copyright (C) 2008-2015, AdaCore                       --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- This unit was originally developed by Matthew J Heaney.                  --
+  29 .: ------------------------------------------------------------------------------
+  30 .: 
+  31 .: pragma Ada_2005;
+  32 .: 
+  33 .: with System;  use type System.Address;
+  34 .: 
+  35 .: with AUnit.Memory;       use AUnit.Memory;
+  36 .: with AUnit.Memory.Utils; use AUnit.Memory.Utils;
+  37 .: 
+  38 .: package body Ada_Containers.AUnit_Lists is
+  39 .: 
+  40 .:    -----------------------
+  41 .:    -- Local Subprograms --
+  42 .:    -----------------------
+  43 .: 
+  44 -:    function New_Node_Type is new AUnit.Memory.Utils.Gen_Alloc
+  45 -:      (Node_Type, Node_Access);
+  46 .: 
+  47 .:    function New_Node_Type
+  48 .:      (Element : Element_Type;
+  49 .:       Next    : Node_Access;
+  50 .:       Prev    : Node_Access)
+  51 .:       return Node_Access;
+  52 .: 
+  53 .:    procedure Insert_Internal
+  54 .:      (Container : in out List;
+  55 .:       Before    : Node_Access;
+  56 .:       New_Node  : Node_Access);
+  57 .: 
+  58 .:    function Vet (Position : Cursor) return Boolean;
+  59 .: 
+  60 .:    --------------
+  61 .:    -- New_Node --
+  62 .:    --------------
+  63 .: 
+  64 .:    function New_Node_Type
+  65 .:      (Element : Element_Type;
+  66 .:       Next    : Node_Access;
+  67 .:       Prev    : Node_Access) return Node_Access
+  68 .:    is
+  69 -:       Res : constant Node_Access := New_Node_Type;
+  70 .:    begin
+  71 -:       Res.Element := Element;
+  72 -:       Res.Next    := Next;
+  73 -:       Res.Prev    := Prev;
+  74 -:       return Res;
+  75 .:    end New_Node_Type;
+  76 .: 
+  77 .:    ---------
+  78 .:    -- "=" --
+  79 .:    ---------
+  80 .: 
+  81 .:    function "=" (Left, Right : List) return Boolean is
+  82 -:       L : Node_Access := Left.First;
+  83 -:       R : Node_Access := Right.First;
+  84 .: 
+  85 .:    begin
+  86 -:       if Left'Address = Right'Address then
+  87 -:          return True;
+  88 .:       end if;
+  89 .: 
+  90 -:       if Left.Length /= Right.Length then
+  91 -:          return False;
+  92 .:       end if;
+  93 .: 
+  94 -:       for J in 1 .. Left.Length loop
+  95 -:          if L.Element /= R.Element then
+  96 -:             return False;
+  97 .:          end if;
+  98 .: 
+  99 -:          L := L.Next;
+ 100 -:          R := R.Next;
+ 101 .:       end loop;
+ 102 .: 
+ 103 -:       return True;
+ 104 .:    end "=";
+ 105 .: 
+ 106 .:    ------------
+ 107 .:    -- Append --
+ 108 .:    ------------
+ 109 .: 
+ 110 .:    procedure Append
+ 111 .:      (Container : in out List;
+ 112 .:       New_Item  : Element_Type;
+ 113 .:       Count     : Count_Type := 1)
+ 114 .:    is
+ 115 .:    begin
+ 116 -:       Insert (Container, No_Element, New_Item, Count);
+ 117 .:    end Append;
+ 118 .: 
+ 119 .:    -----------
+ 120 .:    -- Clear --
+ 121 .:    -----------
+ 122 .: 
+ 123 .:    procedure Clear (Container : in out List) is
+ 124 -:       X : Node_Access;
+ 125 .: 
+ 126 .:    begin
+ 127 -:       if Container.Length = 0 then
+ 128 .:          pragma Assert (Container.First = null);
+ 129 .:          pragma Assert (Container.Last = null);
+ 130 .:          pragma Assert (Container.Busy = 0);
+ 131 .:          pragma Assert (Container.Lock = 0);
+ 132 -:          return;
+ 133 .:       end if;
+ 134 .: 
+ 135 .:       pragma Assert (Container.First.Prev = null);
+ 136 .:       pragma Assert (Container.Last.Next = null);
+ 137 .: 
+ 138 -:       if Container.Busy > 0 then
+ 139 -:          raise Program_Error;
+ 140 .:       end if;
+ 141 .: 
+ 142 -:       while Container.Length > 1 loop
+ 143 -:          X := Container.First;
+ 144 .:          pragma Assert (X.Next.Prev = Container.First);
+ 145 .: 
+ 146 -:          Container.First := X.Next;
+ 147 -:          Container.First.Prev := null;
+ 148 .: 
+ 149 -:          Container.Length := Container.Length - 1;
+ 150 .: 
+ 151 -:          AUnit_Free (X.all'Address);
+ 152 .:       end loop;
+ 153 .: 
+ 154 -:       X := Container.First;
+ 155 .:       pragma Assert (X = Container.Last);
+ 156 .: 
+ 157 -:       Container.First := null;
+ 158 -:       Container.Last := null;
+ 159 -:       Container.Length := 0;
+ 160 .: 
+ 161 -:       AUnit_Free (X.all'Address);
+ 162 .:    end Clear;
+ 163 .: 
+ 164 .:    --------------
+ 165 .:    -- Contains --
+ 166 .:    --------------
+ 167 .: 
+ 168 .:    function Contains
+ 169 .:      (Container : List;
+ 170 .:       Item      : Element_Type) return Boolean
+ 171 .:    is
+ 172 .:    begin
+ 173 -:       return Find (Container, Item) /= No_Element;
+ 174 .:    end Contains;
+ 175 .: 
+ 176 .:    ------------
+ 177 .:    -- Delete --
+ 178 .:    ------------
+ 179 .: 
+ 180 .:    procedure Delete
+ 181 .:      (Container : in out List;
+ 182 .:       Position  : in out Cursor;
+ 183 .:       Count     : Count_Type := 1)
+ 184 .:    is
+ 185 -:       X : Node_Access;
+ 186 .: 
+ 187 .:    begin
+ 188 -:       if Position.Node = null then
+ 189 -:          raise Constraint_Error;
+ 190 .:       end if;
+ 191 .: 
+ 192 -:       if Position.Container /= Container'Unrestricted_Access then
+ 193 -:          raise Program_Error;
+ 194 .:       end if;
+ 195 .: 
+ 196 .:       pragma Assert (Vet (Position), "bad cursor in Delete");
+ 197 .: 
+ 198 -:       if Position.Node = Container.First then
+ 199 -:          Delete_First (Container, Count);
+ 200 -:          Position := No_Element; --  Post-York behavior
+ 201 -:          return;
+ 202 .:       end if;
+ 203 .: 
+ 204 -:       if Count = 0 then
+ 205 -:          Position := No_Element;  --  Post-York behavior
+ 206 -:          return;
+ 207 .:       end if;
+ 208 .: 
+ 209 -:       if Container.Busy > 0 then
+ 210 -:          raise Program_Error;
+ 211 .:       end if;
+ 212 .: 
+ 213 -:       for Index in 1 .. Count loop
+ 214 -:          X := Position.Node;
+ 215 -:          Container.Length := Container.Length - 1;
+ 216 .: 
+ 217 -:          if X = Container.Last then
+ 218 -:             Position := No_Element;
+ 219 .: 
+ 220 -:             Container.Last := X.Prev;
+ 221 -:             Container.Last.Next := null;
+ 222 .: 
+ 223 -:             AUnit_Free (X.all'Address);
+ 224 -:             return;
+ 225 .:          end if;
+ 226 .: 
+ 227 -:          Position.Node := X.Next;
+ 228 .: 
+ 229 -:          X.Next.Prev := X.Prev;
+ 230 -:          X.Prev.Next := X.Next;
+ 231 .: 
+ 232 -:          AUnit_Free (X.all'Address);
+ 233 .:       end loop;
+ 234 .: 
+ 235 -:       Position := No_Element;  --  Post-York behavior
+ 236 .:    end Delete;
+ 237 .: 
+ 238 .:    ------------------
+ 239 .:    -- Delete_First --
+ 240 .:    ------------------
+ 241 .: 
+ 242 .:    procedure Delete_First
+ 243 .:      (Container : in out List;
+ 244 .:       Count     : Count_Type := 1)
+ 245 .:    is
+ 246 -:       X : Node_Access;
+ 247 .: 
+ 248 .:    begin
+ 249 -:       if Count >= Container.Length then
+ 250 -:          Clear (Container);
+ 251 -:          return;
+ 252 .:       end if;
+ 253 .: 
+ 254 -:       if Count = 0 then
+ 255 -:          return;
+ 256 .:       end if;
+ 257 .: 
+ 258 -:       if Container.Busy > 0 then
+ 259 -:          raise Program_Error;
+ 260 .:       end if;
+ 261 .: 
+ 262 -:       for I in 1 .. Count loop
+ 263 -:          X := Container.First;
+ 264 .:          pragma Assert (X.Next.Prev = Container.First);
+ 265 .: 
+ 266 -:          Container.First := X.Next;
+ 267 -:          Container.First.Prev := null;
+ 268 .: 
+ 269 -:          Container.Length := Container.Length - 1;
+ 270 .: 
+ 271 -:          AUnit_Free (X.all'Address);
+ 272 .:       end loop;
+ 273 .:    end Delete_First;
+ 274 .: 
+ 275 .:    -----------------
+ 276 .:    -- Delete_Last --
+ 277 .:    -----------------
+ 278 .: 
+ 279 .:    procedure Delete_Last
+ 280 .:      (Container : in out List;
+ 281 .:       Count     : Count_Type := 1)
+ 282 .:    is
+ 283 -:       X : Node_Access;
+ 284 .: 
+ 285 .:    begin
+ 286 -:       if Count >= Container.Length then
+ 287 -:          Clear (Container);
+ 288 -:          return;
+ 289 .:       end if;
+ 290 .: 
+ 291 -:       if Count = 0 then
+ 292 -:          return;
+ 293 .:       end if;
+ 294 .: 
+ 295 -:       if Container.Busy > 0 then
+ 296 -:          raise Program_Error;
+ 297 .:       end if;
+ 298 .: 
+ 299 -:       for I in 1 .. Count loop
+ 300 -:          X := Container.Last;
+ 301 .:          pragma Assert (X.Prev.Next = Container.Last);
+ 302 .: 
+ 303 -:          Container.Last := X.Prev;
+ 304 -:          Container.Last.Next := null;
+ 305 .: 
+ 306 -:          Container.Length := Container.Length - 1;
+ 307 .: 
+ 308 -:          AUnit_Free (X.all'Address);
+ 309 .:       end loop;
+ 310 .:    end Delete_Last;
+ 311 .: 
+ 312 .:    -------------
+ 313 .:    -- Element --
+ 314 .:    -------------
+ 315 .: 
+ 316 .:    function Element (Position : Cursor) return Element_Type is
+ 317 .:    begin
+ 318 -:       if Position.Node = null then
+ 319 -:          raise Constraint_Error;
+ 320 .:       end if;
+ 321 .: 
+ 322 .:       pragma Assert (Vet (Position), "bad cursor in Element");
+ 323 .: 
+ 324 -:       return Position.Node.Element;
+ 325 .:    end Element;
+ 326 .: 
+ 327 .:    ----------
+ 328 .:    -- Find --
+ 329 .:    ----------
+ 330 .: 
+ 331 .:    function Find
+ 332 .:      (Container : List;
+ 333 .:       Item      : Element_Type;
+ 334 .:       Position  : Cursor := No_Element) return Cursor
+ 335 .:    is
+ 336 -:       Node : Node_Access := Position.Node;
+ 337 .: 
+ 338 .:    begin
+ 339 -:       if Node = null then
+ 340 -:          Node := Container.First;
+ 341 .: 
+ 342 .:       else
+ 343 -:          if Position.Container /= Container'Unrestricted_Access then
+ 344 -:             raise Program_Error;
+ 345 .:          end if;
+ 346 .: 
+ 347 .:          pragma Assert (Vet (Position), "bad cursor in Find");
+ 348 .:       end if;
+ 349 .: 
+ 350 -:       while Node /= null loop
+ 351 -:          if Node.Element = Item then
+ 352 -:             return Cursor'(Container'Unchecked_Access, Node);
+ 353 .:          end if;
+ 354 .: 
+ 355 -:          Node := Node.Next;
+ 356 .:       end loop;
+ 357 .: 
+ 358 -:       return No_Element;
+ 359 .:    end Find;
+ 360 .: 
+ 361 .:    -----------
+ 362 .:    -- First --
+ 363 .:    -----------
+ 364 .: 
+ 365 .:    function First (Container : List) return Cursor is
+ 366 .:    begin
+ 367 -:       if Container.First = null then
+ 368 -:          return No_Element;
+ 369 .:       end if;
+ 370 .: 
+ 371 -:       return Cursor'(Container'Unchecked_Access, Container.First);
+ 372 .:    end First;
+ 373 .: 
+ 374 .:    -------------------
+ 375 .:    -- First_Element --
+ 376 .:    -------------------
+ 377 .: 
+ 378 .:    function First_Element (Container : List) return Element_Type is
+ 379 .:    begin
+ 380 -:       if Container.First = null then
+ 381 -:          raise Constraint_Error;
+ 382 .:       end if;
+ 383 .: 
+ 384 -:       return Container.First.Element;
+ 385 .:    end First_Element;
+ 386 .: 
+ 387 .:    ---------------------
+ 388 .:    -- Generic_Sorting --
+ 389 .:    ---------------------
+ 390 .: 
+ 391 .:    package body Generic_Sorting is
+ 392 .: 
+ 393 .:       ---------------
+ 394 .:       -- Is_Sorted --
+ 395 .:       ---------------
+ 396 .: 
+ 397 .:       function Is_Sorted (Container : List) return Boolean is
+ 398 -:          Node : Node_Access := Container.First;
+ 399 .: 
+ 400 .:       begin
+ 401 -:          for I in 2 .. Container.Length loop
+ 402 -:             if Node.Next.Element < Node.Element then
+ 403 -:                return False;
+ 404 .:             end if;
+ 405 .: 
+ 406 -:             Node := Node.Next;
+ 407 .:          end loop;
+ 408 .: 
+ 409 -:          return True;
+ 410 .:       end Is_Sorted;
+ 411 .: 
+ 412 .:       -----------
+ 413 .:       -- Merge --
+ 414 .:       -----------
+ 415 .: 
+ 416 .:       procedure Merge
+ 417 .:         (Target : in out List;
+ 418 .:          Source : in out List)
+ 419 .:       is
+ 420 -:          LI, RI : Cursor;
+ 421 .: 
+ 422 .:       begin
+ 423 -:          if Target'Address = Source'Address then
+ 424 -:             return;
+ 425 .:          end if;
+ 426 .: 
+ 427 -:          if Target.Busy > 0 then
+ 428 -:             raise Program_Error;
+ 429 .:          end if;
+ 430 .: 
+ 431 -:          if Source.Busy > 0 then
+ 432 -:             raise Program_Error;
+ 433 .:          end if;
+ 434 .: 
+ 435 -:          LI := First (Target);
+ 436 -:          RI := First (Source);
+ 437 -:          while RI.Node /= null loop
+ 438 .:             pragma Assert (RI.Node.Next = null
+ 439 .:                              or else not (RI.Node.Next.Element <
+ 440 .:                                           RI.Node.Element));
+ 441 .: 
+ 442 -:             if LI.Node = null then
+ 443 -:                Splice (Target, No_Element, Source);
+ 444 -:                return;
+ 445 .:             end if;
+ 446 .: 
+ 447 .:             pragma Assert (LI.Node.Next = null
+ 448 .:                              or else not (LI.Node.Next.Element <
+ 449 .:                                           LI.Node.Element));
+ 450 .: 
+ 451 -:             if RI.Node.Element < LI.Node.Element then
+ 452 .:                declare
+ 453 -:                   RJ : Cursor := RI;
+ 454 .:                   pragma Warnings (Off, RJ);
+ 455 .:                begin
+ 456 -:                   RI.Node := RI.Node.Next;
+ 457 -:                   Splice (Target, LI, Source, RJ);
+ 458 .:                end;
+ 459 .: 
+ 460 .:             else
+ 461 -:                LI.Node := LI.Node.Next;
+ 462 .:             end if;
+ 463 .:          end loop;
+ 464 .:       end Merge;
+ 465 .: 
+ 466 .:       ----------
+ 467 .:       -- Sort --
+ 468 .:       ----------
+ 469 .: 
+ 470 .:       procedure Sort (Container : in out List) is
+ 471 .: 
+ 472 .:          procedure Partition (Pivot : Node_Access; Back : Node_Access);
+ 473 .: 
+ 474 .:          procedure Sort (Front, Back : Node_Access);
+ 475 .: 
+ 476 .:          ---------------
+ 477 .:          -- Partition --
+ 478 .:          ---------------
+ 479 .: 
+ 480 .:          procedure Partition (Pivot : Node_Access; Back : Node_Access) is
+ 481 -:             Node : Node_Access := Pivot.Next;
+ 482 .: 
+ 483 .:          begin
+ 484 -:             while Node /= Back loop
+ 485 -:                if Node.Element < Pivot.Element then
+ 486 .:                   declare
+ 487 -:                      Prev : constant Node_Access := Node.Prev;
+ 488 -:                      Next : constant Node_Access := Node.Next;
+ 489 .: 
+ 490 .:                   begin
+ 491 -:                      Prev.Next := Next;
+ 492 .: 
+ 493 -:                      if Next = null then
+ 494 -:                         Container.Last := Prev;
+ 495 .:                      else
+ 496 -:                         Next.Prev := Prev;
+ 497 .:                      end if;
+ 498 .: 
+ 499 -:                      Node.Next := Pivot;
+ 500 -:                      Node.Prev := Pivot.Prev;
+ 501 .: 
+ 502 -:                      Pivot.Prev := Node;
+ 503 .: 
+ 504 -:                      if Node.Prev = null then
+ 505 -:                         Container.First := Node;
+ 506 .:                      else
+ 507 -:                         Node.Prev.Next := Node;
+ 508 .:                      end if;
+ 509 .: 
+ 510 -:                      Node := Next;
+ 511 .:                   end;
+ 512 .: 
+ 513 .:                else
+ 514 -:                   Node := Node.Next;
+ 515 .:                end if;
+ 516 .:             end loop;
+ 517 .:          end Partition;
+ 518 .: 
+ 519 .:          ----------
+ 520 .:          -- Sort --
+ 521 .:          ----------
+ 522 .: 
+ 523 .:          procedure Sort (Front, Back : Node_Access) is
+ 524 -:             Pivot : Node_Access;
+ 525 .: 
+ 526 .:          begin
+ 527 -:             if Front = null then
+ 528 -:                Pivot := Container.First;
+ 529 .:             else
+ 530 -:                Pivot := Front.Next;
+ 531 .:             end if;
+ 532 .: 
+ 533 -:             if Pivot /= Back then
+ 534 -:                Partition (Pivot, Back);
+ 535 -:                Sort (Front, Pivot);
+ 536 -:                Sort (Pivot, Back);
+ 537 .:             end if;
+ 538 .:          end Sort;
+ 539 .: 
+ 540 .:       --  Start of processing for Sort
+ 541 .: 
+ 542 .:       begin
+ 543 -:          if Container.Length <= 1 then
+ 544 -:             return;
+ 545 .:          end if;
+ 546 .: 
+ 547 .:          pragma Assert (Container.First.Prev = null);
+ 548 .:          pragma Assert (Container.Last.Next = null);
+ 549 .: 
+ 550 -:          if Container.Busy > 0 then
+ 551 -:             raise Program_Error;
+ 552 .:          end if;
+ 553 .: 
+ 554 -:          Sort (Front => null, Back => null);
+ 555 .: 
+ 556 .:          pragma Assert (Container.First.Prev = null);
+ 557 .:          pragma Assert (Container.Last.Next = null);
+ 558 .:       end Sort;
+ 559 .: 
+ 560 .:    end Generic_Sorting;
+ 561 .: 
+ 562 .:    -----------------
+ 563 .:    -- Has_Element --
+ 564 .:    -----------------
+ 565 .: 
+ 566 .:    function Has_Element (Position : Cursor) return Boolean is
+ 567 .:    begin
+ 568 .:       pragma Assert (Vet (Position), "bad cursor in Has_Element");
+ 569 -:       return Position.Node /= null;
+ 570 .:    end Has_Element;
+ 571 .: 
+ 572 .:    ------------
+ 573 .:    -- Insert --
+ 574 .:    ------------
+ 575 .: 
+ 576 .:    procedure Insert
+ 577 .:      (Container : in out List;
+ 578 .:       Before    : Cursor;
+ 579 .:       New_Item  : Element_Type;
+ 580 .:       Position  : out Cursor;
+ 581 .:       Count     : Count_Type := 1)
+ 582 .:    is
+ 583 -:       New_Node : Node_Access;
+ 584 .: 
+ 585 .:    begin
+ 586 -:       if Before.Container /= null then
+ 587 -:          if Before.Container /= Container'Unrestricted_Access then
+ 588 -:             raise Program_Error;
+ 589 .:          end if;
+ 590 .: 
+ 591 .:          pragma Assert (Vet (Before), "bad cursor in Insert");
+ 592 .:       end if;
+ 593 .: 
+ 594 -:       if Count = 0 then
+ 595 -:          Position := Before;
+ 596 -:          return;
+ 597 .:       end if;
+ 598 .: 
+ 599 -:       if Container.Length > Count_Type'Last - Count then
+ 600 -:          raise Constraint_Error;
+ 601 .:       end if;
+ 602 .: 
+ 603 -:       if Container.Busy > 0 then
+ 604 -:          raise Program_Error;
+ 605 .:       end if;
+ 606 .: 
+ 607 -:       New_Node := New_Node_Type (New_Item, null, null);
+ 608 -:       Insert_Internal (Container, Before.Node, New_Node);
+ 609 .: 
+ 610 -:       Position := Cursor'(Container'Unchecked_Access, New_Node);
+ 611 .: 
+ 612 -:       for J in Count_Type'(2) .. Count loop
+ 613 -:          New_Node := New_Node_Type (New_Item, null, null);
+ 614 -:          Insert_Internal (Container, Before.Node, New_Node);
+ 615 .:       end loop;
+ 616 .:    end Insert;
+ 617 .: 
+ 618 .:    procedure Insert
+ 619 .:      (Container : in out List;
+ 620 .:       Before    : Cursor;
+ 621 .:       New_Item  : Element_Type;
+ 622 .:       Count     : Count_Type := 1)
+ 623 .:    is
+ 624 -:       Position : Cursor;
+ 625 .:       pragma Unreferenced (Position);
+ 626 .:    begin
+ 627 -:       Insert (Container, Before, New_Item, Position, Count);
+ 628 .:    end Insert;
+ 629 .: 
+ 630 .:    procedure Insert
+ 631 .:      (Container : in out List;
+ 632 .:       Before    : Cursor;
+ 633 .:       Position  : out Cursor;
+ 634 .:       Count     : Count_Type := 1)
+ 635 .:    is
+ 636 -:       New_Node : Node_Access;
+ 637 .: 
+ 638 .:    begin
+ 639 -:       if Before.Container /= null then
+ 640 -:          if Before.Container /= Container'Unrestricted_Access then
+ 641 -:             raise Program_Error;
+ 642 .:          end if;
+ 643 .: 
+ 644 .:          pragma Assert (Vet (Before), "bad cursor in Insert");
+ 645 .:       end if;
+ 646 .: 
+ 647 -:       if Count = 0 then
+ 648 -:          Position := Before;
+ 649 -:          return;
+ 650 .:       end if;
+ 651 .: 
+ 652 -:       if Container.Length > Count_Type'Last - Count then
+ 653 -:          raise Constraint_Error;
+ 654 .:       end if;
+ 655 .: 
+ 656 -:       if Container.Busy > 0 then
+ 657 -:          raise Program_Error;
+ 658 .:       end if;
+ 659 .: 
+ 660 -:       New_Node := New_Node_Type;
+ 661 -:       Insert_Internal (Container, Before.Node, New_Node);
+ 662 .: 
+ 663 -:       Position := Cursor'(Container'Unchecked_Access, New_Node);
+ 664 .: 
+ 665 -:       for J in Count_Type'(2) .. Count loop
+ 666 -:          New_Node := New_Node_Type;
+ 667 -:          Insert_Internal (Container, Before.Node, New_Node);
+ 668 .:       end loop;
+ 669 .:    end Insert;
+ 670 .: 
+ 671 .:    ---------------------
+ 672 .:    -- Insert_Internal --
+ 673 .:    ---------------------
+ 674 .: 
+ 675 .:    procedure Insert_Internal
+ 676 .:      (Container : in out List;
+ 677 .:       Before    : Node_Access;
+ 678 .:       New_Node  : Node_Access)
+ 679 .:    is
+ 680 .:    begin
+ 681 -:       if Container.Length = 0 then
+ 682 .:          pragma Assert (Before = null);
+ 683 .:          pragma Assert (Container.First = null);
+ 684 .:          pragma Assert (Container.Last = null);
+ 685 .: 
+ 686 -:          Container.First := New_Node;
+ 687 -:          Container.Last := New_Node;
+ 688 .: 
+ 689 -:       elsif Before = null then
+ 690 .:          pragma Assert (Container.Last.Next = null);
+ 691 .: 
+ 692 -:          Container.Last.Next := New_Node;
+ 693 -:          New_Node.Prev := Container.Last;
+ 694 .: 
+ 695 -:          Container.Last := New_Node;
+ 696 .: 
+ 697 -:       elsif Before = Container.First then
+ 698 .:          pragma Assert (Container.First.Prev = null);
+ 699 .: 
+ 700 -:          Container.First.Prev := New_Node;
+ 701 -:          New_Node.Next := Container.First;
+ 702 .: 
+ 703 -:          Container.First := New_Node;
+ 704 .: 
+ 705 .:       else
+ 706 .:          pragma Assert (Container.First.Prev = null);
+ 707 .:          pragma Assert (Container.Last.Next = null);
+ 708 .: 
+ 709 -:          New_Node.Next := Before;
+ 710 -:          New_Node.Prev := Before.Prev;
+ 711 .: 
+ 712 -:          Before.Prev.Next := New_Node;
+ 713 -:          Before.Prev := New_Node;
+ 714 .:       end if;
+ 715 .: 
+ 716 -:       Container.Length := Container.Length + 1;
+ 717 .:    end Insert_Internal;
+ 718 .: 
+ 719 .:    --------------
+ 720 .:    -- Is_Empty --
+ 721 .:    --------------
+ 722 .: 
+ 723 .:    function Is_Empty (Container : List) return Boolean is
+ 724 .:    begin
+ 725 -:       return Container.Length = 0;
+ 726 .:    end Is_Empty;
+ 727 .: 
+ 728 .:    -------------
+ 729 .:    -- Iterate --
+ 730 .:    -------------
+ 731 .: 
+ 732 .:    procedure Iterate
+ 733 .:      (Container : List;
+ 734 .:       Process   : Iterator)
+ 735 .:    is
+ 736 -:       C : List renames Container'Unrestricted_Access.all;
+ 737 -:       B : Natural renames C.Busy;
+ 738 .: 
+ 739 -:       Node : Node_Access := Container.First;
+ 740 .: 
+ 741 .:    begin
+ 742 -:       B := B + 1;
+ 743 .: 
+ 744 .:       begin
+ 745 -:          while Node /= null loop
+ 746 -:             Process (Cursor'(Container'Unchecked_Access, Node));
+ 747 -:             Node := Node.Next;
+ 748 .:          end loop;
+ 749 .:       end;
+ 750 .: 
+ 751 -:       B := B - 1;
+ 752 .:    end Iterate;
+ 753 .: 
+ 754 .:    ----------
+ 755 .:    -- Last --
+ 756 .:    ----------
+ 757 .: 
+ 758 .:    function Last (Container : List) return Cursor is
+ 759 .:    begin
+ 760 -:       if Container.Last = null then
+ 761 -:          return No_Element;
+ 762 .:       end if;
+ 763 .: 
+ 764 -:       return Cursor'(Container'Unchecked_Access, Container.Last);
+ 765 .:    end Last;
+ 766 .: 
+ 767 .:    ------------------
+ 768 .:    -- Last_Element --
+ 769 .:    ------------------
+ 770 .: 
+ 771 .:    function Last_Element (Container : List) return Element_Type is
+ 772 .:    begin
+ 773 -:       if Container.Last = null then
+ 774 -:          raise Constraint_Error;
+ 775 .:       end if;
+ 776 .: 
+ 777 -:       return Container.Last.Element;
+ 778 .:    end Last_Element;
+ 779 .: 
+ 780 .:    ------------
+ 781 .:    -- Length --
+ 782 .:    ------------
+ 783 .: 
+ 784 .:    function Length (Container : List) return Count_Type is
+ 785 .:    begin
+ 786 -:       return Container.Length;
+ 787 .:    end Length;
+ 788 .: 
+ 789 .:    ----------
+ 790 .:    -- Move --
+ 791 .:    ----------
+ 792 .: 
+ 793 .:    procedure Move
+ 794 .:      (Target : in out List;
+ 795 .:       Source : in out List)
+ 796 .:    is
+ 797 .:    begin
+ 798 -:       if Target'Address = Source'Address then
+ 799 -:          return;
+ 800 .:       end if;
+ 801 .: 
+ 802 -:       if Source.Busy > 0 then
+ 803 -:          raise Program_Error;
+ 804 .:       end if;
+ 805 .: 
+ 806 -:       Clear (Target);
+ 807 .: 
+ 808 -:       Target.First := Source.First;
+ 809 -:       Source.First := null;
+ 810 .: 
+ 811 -:       Target.Last := Source.Last;
+ 812 -:       Source.Last := null;
+ 813 .: 
+ 814 -:       Target.Length := Source.Length;
+ 815 -:       Source.Length := 0;
+ 816 .:    end Move;
+ 817 .: 
+ 818 .:    ----------
+ 819 .:    -- Next --
+ 820 .:    ----------
+ 821 .: 
+ 822 .:    procedure Next (Position : in out Cursor) is
+ 823 .:    begin
+ 824 -:       Position := Next (Position);
+ 825 .:    end Next;
+ 826 .: 
+ 827 .:    function Next (Position : Cursor) return Cursor is
+ 828 .:    begin
+ 829 -:       if Position.Node = null then
+ 830 -:          return No_Element;
+ 831 .:       end if;
+ 832 .: 
+ 833 .:       pragma Assert (Vet (Position), "bad cursor in Next");
+ 834 .: 
+ 835 .:       declare
+ 836 -:          Next_Node : constant Node_Access := Position.Node.Next;
+ 837 .:       begin
+ 838 -:          if Next_Node = null then
+ 839 -:             return No_Element;
+ 840 .:          end if;
+ 841 .: 
+ 842 -:          return Cursor'(Position.Container, Next_Node);
+ 843 .:       end;
+ 844 .:    end Next;
+ 845 .: 
+ 846 .:    -------------
+ 847 .:    -- Prepend --
+ 848 .:    -------------
+ 849 .: 
+ 850 .:    procedure Prepend
+ 851 .:      (Container : in out List;
+ 852 .:       New_Item  : Element_Type;
+ 853 .:       Count     : Count_Type := 1)
+ 854 .:    is
+ 855 .:    begin
+ 856 -:       Insert (Container, First (Container), New_Item, Count);
+ 857 .:    end Prepend;
+ 858 .: 
+ 859 .:    --------------
+ 860 .:    -- Previous --
+ 861 .:    --------------
+ 862 .: 
+ 863 .:    procedure Previous (Position : in out Cursor) is
+ 864 .:    begin
+ 865 -:       Position := Previous (Position);
+ 866 .:    end Previous;
+ 867 .: 
+ 868 .:    function Previous (Position : Cursor) return Cursor is
+ 869 .:    begin
+ 870 -:       if Position.Node = null then
+ 871 -:          return No_Element;
+ 872 .:       end if;
+ 873 .: 
+ 874 .:       pragma Assert (Vet (Position), "bad cursor in Previous");
+ 875 .: 
+ 876 .:       declare
+ 877 -:          Prev_Node : constant Node_Access := Position.Node.Prev;
+ 878 .:       begin
+ 879 -:          if Prev_Node = null then
+ 880 -:             return No_Element;
+ 881 .:          end if;
+ 882 .: 
+ 883 -:          return Cursor'(Position.Container, Prev_Node);
+ 884 .:       end;
+ 885 .:    end Previous;
+ 886 .: 
+ 887 .:    ---------------------
+ 888 .:    -- Replace_Element --
+ 889 .:    ---------------------
+ 890 .: 
+ 891 .:    procedure Replace_Element
+ 892 .:      (Container : in out List;
+ 893 .:       Position  : Cursor;
+ 894 .:       New_Item  : Element_Type)
+ 895 .:    is
+ 896 .:    begin
+ 897 -:       if Position.Container = null then
+ 898 -:          raise Constraint_Error;
+ 899 .:       end if;
+ 900 .: 
+ 901 -:       if Position.Container /= Container'Unchecked_Access then
+ 902 -:          raise Program_Error;
+ 903 .:       end if;
+ 904 .: 
+ 905 -:       if Container.Lock > 0 then
+ 906 -:          raise Program_Error;
+ 907 .:       end if;
+ 908 .: 
+ 909 .:       pragma Assert (Vet (Position), "bad cursor in Replace_Element");
+ 910 .: 
+ 911 -:       Position.Node.Element := New_Item;
+ 912 .:    end Replace_Element;
+ 913 .: 
+ 914 .:    ----------------------
+ 915 .:    -- Reverse_Elements --
+ 916 .:    ----------------------
+ 917 .: 
+ 918 .:    procedure Reverse_Elements (Container : in out List) is
+ 919 -:       I : Node_Access := Container.First;
+ 920 -:       J : Node_Access := Container.Last;
+ 921 .: 
+ 922 .:       procedure Swap (L, R : Node_Access);
+ 923 .: 
+ 924 .:       ----------
+ 925 .:       -- Swap --
+ 926 .:       ----------
+ 927 .: 
+ 928 .:       procedure Swap (L, R : Node_Access) is
+ 929 -:          LN : constant Node_Access := L.Next;
+ 930 -:          LP : constant Node_Access := L.Prev;
+ 931 .: 
+ 932 -:          RN : constant Node_Access := R.Next;
+ 933 -:          RP : constant Node_Access := R.Prev;
+ 934 .: 
+ 935 .:       begin
+ 936 -:          if LP /= null then
+ 937 -:             LP.Next := R;
+ 938 .:          end if;
+ 939 .: 
+ 940 -:          if RN /= null then
+ 941 -:             RN.Prev := L;
+ 942 .:          end if;
+ 943 .: 
+ 944 -:          L.Next := RN;
+ 945 -:          R.Prev := LP;
+ 946 .: 
+ 947 -:          if LN = R then
+ 948 .:             pragma Assert (RP = L);
+ 949 .: 
+ 950 -:             L.Prev := R;
+ 951 -:             R.Next := L;
+ 952 .: 
+ 953 .:          else
+ 954 -:             L.Prev := RP;
+ 955 -:             RP.Next := L;
+ 956 .: 
+ 957 -:             R.Next := LN;
+ 958 -:             LN.Prev := R;
+ 959 .:          end if;
+ 960 .:       end Swap;
+ 961 .: 
+ 962 .:    --  Start of processing for Reverse_Elements
+ 963 .: 
+ 964 .:    begin
+ 965 -:       if Container.Length <= 1 then
+ 966 -:          return;
+ 967 .:       end if;
+ 968 .: 
+ 969 .:       pragma Assert (Container.First.Prev = null);
+ 970 .:       pragma Assert (Container.Last.Next = null);
+ 971 .: 
+ 972 -:       if Container.Busy > 0 then
+ 973 -:          raise Program_Error;
+ 974 .:       end if;
+ 975 .: 
+ 976 -:       Container.First := J;
+ 977 -:       Container.Last := I;
+ 978 .:       loop
+ 979 -:          Swap (L => I, R => J);
+ 980 .: 
+ 981 -:          J := J.Next;
+ 982 -:          exit when I = J;
+ 983 .: 
+ 984 -:          I := I.Prev;
+ 985 -:          exit when I = J;
+ 986 .: 
+ 987 -:          Swap (L => J, R => I);
+ 988 .: 
+ 989 -:          I := I.Next;
+ 990 -:          exit when I = J;
+ 991 .: 
+ 992 -:          J := J.Prev;
+ 993 -:          exit when I = J;
+ 994 .:       end loop;
+ 995 .: 
+ 996 .:       pragma Assert (Container.First.Prev = null);
+ 997 .:       pragma Assert (Container.Last.Next = null);
+ 998 .:    end Reverse_Elements;
+ 999 .: 
+1000 .:    ------------------
+1001 .:    -- Reverse_Find --
+1002 .:    ------------------
+1003 .: 
+1004 .:    function Reverse_Find
+1005 .:      (Container : List;
+1006 .:       Item      : Element_Type;
+1007 .:       Position  : Cursor := No_Element) return Cursor
+1008 .:    is
+1009 -:       Node : Node_Access := Position.Node;
+1010 .: 
+1011 .:    begin
+1012 -:       if Node = null then
+1013 -:          Node := Container.Last;
+1014 .: 
+1015 .:       else
+1016 -:          if Position.Container /= Container'Unrestricted_Access then
+1017 -:             raise Program_Error;
+1018 .:          end if;
+1019 .: 
+1020 .:          pragma Assert (Vet (Position), "bad cursor in Reverse_Find");
+1021 .:       end if;
+1022 .: 
+1023 -:       while Node /= null loop
+1024 -:          if Node.Element = Item then
+1025 -:             return Cursor'(Container'Unchecked_Access, Node);
+1026 .:          end if;
+1027 .: 
+1028 -:          Node := Node.Prev;
+1029 .:       end loop;
+1030 .: 
+1031 -:       return No_Element;
+1032 .:    end Reverse_Find;
+1033 .: 
+1034 .:    ------------
+1035 .:    -- Splice --
+1036 .:    ------------
+1037 .: 
+1038 .:    procedure Splice
+1039 .:      (Target : in out List;
+1040 .:       Before : Cursor;
+1041 .:       Source : in out List)
+1042 .:    is
+1043 .:    begin
+1044 -:       if Before.Container /= null then
+1045 -:          if Before.Container /= Target'Unrestricted_Access then
+1046 -:             raise Program_Error;
+1047 .:          end if;
+1048 .: 
+1049 .:          pragma Assert (Vet (Before), "bad cursor in Splice");
+1050 .:       end if;
+1051 .: 
+1052 -:       if Target'Address = Source'Address
+1053 -:         or else Source.Length = 0
+1054 .:       then
+1055 -:          return;
+1056 .:       end if;
+1057 .: 
+1058 .:       pragma Assert (Source.First.Prev = null);
+1059 .:       pragma Assert (Source.Last.Next = null);
+1060 .: 
+1061 -:       if Target.Length > Count_Type'Last - Source.Length then
+1062 -:          raise Constraint_Error;
+1063 .:       end if;
+1064 .: 
+1065 -:       if Target.Busy > 0 then
+1066 -:          raise Program_Error;
+1067 .:       end if;
+1068 .: 
+1069 -:       if Source.Busy > 0 then
+1070 -:          raise Program_Error;
+1071 .:       end if;
+1072 .: 
+1073 -:       if Target.Length = 0 then
+1074 .:          pragma Assert (Target.First = null);
+1075 .:          pragma Assert (Target.Last = null);
+1076 .:          pragma Assert (Before = No_Element);
+1077 .: 
+1078 -:          Target.First := Source.First;
+1079 -:          Target.Last := Source.Last;
+1080 .: 
+1081 -:       elsif Before.Node = null then
+1082 .:          pragma Assert (Target.Last.Next = null);
+1083 .: 
+1084 -:          Target.Last.Next := Source.First;
+1085 -:          Source.First.Prev := Target.Last;
+1086 .: 
+1087 -:          Target.Last := Source.Last;
+1088 .: 
+1089 -:       elsif Before.Node = Target.First then
+1090 .:          pragma Assert (Target.First.Prev = null);
+1091 .: 
+1092 -:          Source.Last.Next := Target.First;
+1093 -:          Target.First.Prev := Source.Last;
+1094 .: 
+1095 -:          Target.First := Source.First;
+1096 .: 
+1097 .:       else
+1098 .:          pragma Assert (Target.Length >= 2);
+1099 .: 
+1100 -:          Before.Node.Prev.Next := Source.First;
+1101 -:          Source.First.Prev := Before.Node.Prev;
+1102 .: 
+1103 -:          Before.Node.Prev := Source.Last;
+1104 -:          Source.Last.Next := Before.Node;
+1105 .:       end if;
+1106 .: 
+1107 -:       Source.First := null;
+1108 -:       Source.Last := null;
+1109 .: 
+1110 -:       Target.Length := Target.Length + Source.Length;
+1111 -:       Source.Length := 0;
+1112 .:    end Splice;
+1113 .: 
+1114 .:    procedure Splice
+1115 .:      (Container : in out List;
+1116 .:       Before    : Cursor;
+1117 .:       Position  : Cursor)
+1118 .:    is
+1119 .:    begin
+1120 -:       if Before.Container /= null then
+1121 -:          if Before.Container /= Container'Unchecked_Access then
+1122 -:             raise Program_Error;
+1123 .:          end if;
+1124 .: 
+1125 .:          pragma Assert (Vet (Before), "bad Before cursor in Splice");
+1126 .:       end if;
+1127 .: 
+1128 -:       if Position.Node = null then
+1129 -:          raise Constraint_Error;
+1130 .:       end if;
+1131 .: 
+1132 -:       if Position.Container /= Container'Unrestricted_Access then
+1133 -:          raise Program_Error;
+1134 .:       end if;
+1135 .: 
+1136 .:       pragma Assert (Vet (Position), "bad Position cursor in Splice");
+1137 .: 
+1138 -:       if Position.Node = Before.Node
+1139 -:         or else Position.Node.Next = Before.Node
+1140 .:       then
+1141 -:          return;
+1142 .:       end if;
+1143 .: 
+1144 .:       pragma Assert (Container.Length >= 2);
+1145 .: 
+1146 -:       if Container.Busy > 0 then
+1147 -:          raise Program_Error;
+1148 .:       end if;
+1149 .: 
+1150 -:       if Before.Node = null then
+1151 .:          pragma Assert (Position.Node /= Container.Last);
+1152 .: 
+1153 -:          if Position.Node = Container.First then
+1154 -:             Container.First := Position.Node.Next;
+1155 -:             Container.First.Prev := null;
+1156 .:          else
+1157 -:             Position.Node.Prev.Next := Position.Node.Next;
+1158 -:             Position.Node.Next.Prev := Position.Node.Prev;
+1159 .:          end if;
+1160 .: 
+1161 -:          Container.Last.Next := Position.Node;
+1162 -:          Position.Node.Prev := Container.Last;
+1163 .: 
+1164 -:          Container.Last := Position.Node;
+1165 -:          Container.Last.Next := null;
+1166 .: 
+1167 -:          return;
+1168 .:       end if;
+1169 .: 
+1170 -:       if Before.Node = Container.First then
+1171 .:          pragma Assert (Position.Node /= Container.First);
+1172 .: 
+1173 -:          if Position.Node = Container.Last then
+1174 -:             Container.Last := Position.Node.Prev;
+1175 -:             Container.Last.Next := null;
+1176 .:          else
+1177 -:             Position.Node.Prev.Next := Position.Node.Next;
+1178 -:             Position.Node.Next.Prev := Position.Node.Prev;
+1179 .:          end if;
+1180 .: 
+1181 -:          Container.First.Prev := Position.Node;
+1182 -:          Position.Node.Next := Container.First;
+1183 .: 
+1184 -:          Container.First := Position.Node;
+1185 -:          Container.First.Prev := null;
+1186 .: 
+1187 -:          return;
+1188 .:       end if;
+1189 .: 
+1190 -:       if Position.Node = Container.First then
+1191 -:          Container.First := Position.Node.Next;
+1192 -:          Container.First.Prev := null;
+1193 .: 
+1194 -:       elsif Position.Node = Container.Last then
+1195 -:          Container.Last := Position.Node.Prev;
+1196 -:          Container.Last.Next := null;
+1197 .: 
+1198 .:       else
+1199 -:          Position.Node.Prev.Next := Position.Node.Next;
+1200 -:          Position.Node.Next.Prev := Position.Node.Prev;
+1201 .:       end if;
+1202 .: 
+1203 -:       Before.Node.Prev.Next := Position.Node;
+1204 -:       Position.Node.Prev := Before.Node.Prev;
+1205 .: 
+1206 -:       Before.Node.Prev := Position.Node;
+1207 -:       Position.Node.Next := Before.Node;
+1208 .: 
+1209 .:       pragma Assert (Container.First.Prev = null);
+1210 .:       pragma Assert (Container.Last.Next = null);
+1211 .:    end Splice;
+1212 .: 
+1213 .:    procedure Splice
+1214 .:      (Target   : in out List;
+1215 .:       Before   : Cursor;
+1216 .:       Source   : in out List;
+1217 .:       Position : in out Cursor)
+1218 .:    is
+1219 .:    begin
+1220 -:       if Target'Address = Source'Address then
+1221 -:          Splice (Target, Before, Position);
+1222 -:          return;
+1223 .:       end if;
+1224 .: 
+1225 -:       if Before.Container /= null then
+1226 -:          if Before.Container /= Target'Unrestricted_Access then
+1227 -:             raise Program_Error;
+1228 .:          end if;
+1229 .: 
+1230 .:          pragma Assert (Vet (Before), "bad Before cursor in Splice");
+1231 .:       end if;
+1232 .: 
+1233 -:       if Position.Node = null then
+1234 -:          raise Constraint_Error;
+1235 .:       end if;
+1236 .: 
+1237 -:       if Position.Container /= Source'Unrestricted_Access then
+1238 -:          raise Program_Error;
+1239 .:       end if;
+1240 .: 
+1241 .:       pragma Assert (Vet (Position), "bad Position cursor in Splice");
+1242 .: 
+1243 -:       if Target.Length = Count_Type'Last then
+1244 -:          raise Constraint_Error;
+1245 .:       end if;
+1246 .: 
+1247 -:       if Target.Busy > 0 then
+1248 -:          raise Program_Error;
+1249 .:       end if;
+1250 .: 
+1251 -:       if Source.Busy > 0 then
+1252 -:          raise Program_Error;
+1253 .:       end if;
+1254 .: 
+1255 -:       if Position.Node = Source.First then
+1256 -:          Source.First := Position.Node.Next;
+1257 .: 
+1258 -:          if Position.Node = Source.Last then
+1259 .:             pragma Assert (Source.First = null);
+1260 .:             pragma Assert (Source.Length = 1);
+1261 -:             Source.Last := null;
+1262 .: 
+1263 .:          else
+1264 -:             Source.First.Prev := null;
+1265 .:          end if;
+1266 .: 
+1267 -:       elsif Position.Node = Source.Last then
+1268 .:          pragma Assert (Source.Length >= 2);
+1269 -:          Source.Last := Position.Node.Prev;
+1270 -:          Source.Last.Next := null;
+1271 .: 
+1272 .:       else
+1273 .:          pragma Assert (Source.Length >= 3);
+1274 -:          Position.Node.Prev.Next := Position.Node.Next;
+1275 -:          Position.Node.Next.Prev := Position.Node.Prev;
+1276 .:       end if;
+1277 .: 
+1278 -:       if Target.Length = 0 then
+1279 .:          pragma Assert (Target.First = null);
+1280 .:          pragma Assert (Target.Last = null);
+1281 .:          pragma Assert (Before = No_Element);
+1282 .: 
+1283 -:          Target.First := Position.Node;
+1284 -:          Target.Last := Position.Node;
+1285 .: 
+1286 -:          Target.First.Prev := null;
+1287 -:          Target.Last.Next := null;
+1288 .: 
+1289 -:       elsif Before.Node = null then
+1290 .:          pragma Assert (Target.Last.Next = null);
+1291 -:          Target.Last.Next := Position.Node;
+1292 -:          Position.Node.Prev := Target.Last;
+1293 .: 
+1294 -:          Target.Last := Position.Node;
+1295 -:          Target.Last.Next := null;
+1296 .: 
+1297 -:       elsif Before.Node = Target.First then
+1298 .:          pragma Assert (Target.First.Prev = null);
+1299 -:          Target.First.Prev := Position.Node;
+1300 -:          Position.Node.Next := Target.First;
+1301 .: 
+1302 -:          Target.First := Position.Node;
+1303 -:          Target.First.Prev := null;
+1304 .: 
+1305 .:       else
+1306 .:          pragma Assert (Target.Length >= 2);
+1307 -:          Before.Node.Prev.Next := Position.Node;
+1308 -:          Position.Node.Prev := Before.Node.Prev;
+1309 .: 
+1310 -:          Before.Node.Prev := Position.Node;
+1311 -:          Position.Node.Next := Before.Node;
+1312 .:       end if;
+1313 .: 
+1314 -:       Target.Length := Target.Length + 1;
+1315 -:       Source.Length := Source.Length - 1;
+1316 .: 
+1317 -:       Position.Container := Target'Unchecked_Access;
+1318 .:    end Splice;
+1319 .: 
+1320 .:    ----------
+1321 .:    -- Swap --
+1322 .:    ----------
+1323 .: 
+1324 .:    procedure Swap
+1325 .:      (Container : in out List;
+1326 .:       I, J      : Cursor)
+1327 .:    is
+1328 .:    begin
+1329 -:       if I.Node = null then
+1330 -:          raise Constraint_Error;
+1331 .:       end if;
+1332 .: 
+1333 -:       if J.Node = null then
+1334 -:          raise Constraint_Error;
+1335 .:       end if;
+1336 .: 
+1337 -:       if I.Container /= Container'Unchecked_Access then
+1338 -:          raise Program_Error;
+1339 .:       end if;
+1340 .: 
+1341 -:       if J.Container /= Container'Unchecked_Access then
+1342 -:          raise Program_Error;
+1343 .:       end if;
+1344 .: 
+1345 -:       if I.Node = J.Node then
+1346 -:          return;
+1347 .:       end if;
+1348 .: 
+1349 -:       if Container.Lock > 0 then
+1350 -:          raise Program_Error;
+1351 .:       end if;
+1352 .: 
+1353 .:       pragma Assert (Vet (I), "bad I cursor in Swap");
+1354 .:       pragma Assert (Vet (J), "bad J cursor in Swap");
+1355 .: 
+1356 .:       declare
+1357 -:          EI : Element_Type renames I.Node.Element;
+1358 -:          EJ : Element_Type renames J.Node.Element;
+1359 .: 
+1360 -:          EI_Copy : constant Element_Type := EI;
+1361 .: 
+1362 .:       begin
+1363 -:          EI := EJ;
+1364 -:          EJ := EI_Copy;
+1365 .:       end;
+1366 .:    end Swap;
+1367 .: 
+1368 .:    ----------------
+1369 .:    -- Swap_Links --
+1370 .:    ----------------
+1371 .: 
+1372 .:    procedure Swap_Links
+1373 .:      (Container : in out List;
+1374 .:       I, J      : Cursor)
+1375 .:    is
+1376 .:    begin
+1377 -:       if I.Node = null then
+1378 -:          raise Constraint_Error;
+1379 .:       end if;
+1380 .: 
+1381 -:       if J.Node = null then
+1382 -:          raise Constraint_Error;
+1383 .:       end if;
+1384 .: 
+1385 -:       if I.Container /= Container'Unrestricted_Access then
+1386 -:          raise Program_Error;
+1387 .:       end if;
+1388 .: 
+1389 -:       if J.Container /= Container'Unrestricted_Access then
+1390 -:          raise Program_Error;
+1391 .:       end if;
+1392 .: 
+1393 -:       if I.Node = J.Node then
+1394 -:          return;
+1395 .:       end if;
+1396 .: 
+1397 -:       if Container.Busy > 0 then
+1398 -:          raise Program_Error;
+1399 .:       end if;
+1400 .: 
+1401 .:       pragma Assert (Vet (I), "bad I cursor in Swap_Links");
+1402 .:       pragma Assert (Vet (J), "bad J cursor in Swap_Links");
+1403 .: 
+1404 .:       declare
+1405 -:          I_Next : constant Cursor := Next (I);
+1406 .: 
+1407 .:       begin
+1408 -:          if I_Next = J then
+1409 -:             Splice (Container, Before => I, Position => J);
+1410 .: 
+1411 .:          else
+1412 .:             declare
+1413 -:                J_Next : constant Cursor := Next (J);
+1414 .: 
+1415 .:             begin
+1416 -:                if J_Next = I then
+1417 -:                   Splice (Container, Before => J, Position => I);
+1418 .: 
+1419 .:                else
+1420 .:                   pragma Assert (Container.Length >= 3);
+1421 .: 
+1422 -:                   Splice (Container, Before => I_Next, Position => J);
+1423 -:                   Splice (Container, Before => J_Next, Position => I);
+1424 .:                end if;
+1425 .:             end;
+1426 .:          end if;
+1427 .:       end;
+1428 .:    end Swap_Links;
+1429 .: 
+1430 .:    ---------
+1431 .:    -- Vet --
+1432 .:    ---------
+1433 .: 
+1434 .:    function Vet (Position : Cursor) return Boolean is
+1435 .:    begin
+1436 -:       if Position.Node = null then
+1437 -:          return Position.Container = null;
+1438 .:       end if;
+1439 .: 
+1440 -:       if Position.Container = null then
+1441 -:          return False;
+1442 .:       end if;
+1443 .: 
+1444 -:       if Position.Node.Next = Position.Node then
+1445 -:          return False;
+1446 .:       end if;
+1447 .: 
+1448 -:       if Position.Node.Prev = Position.Node then
+1449 -:          return False;
+1450 .:       end if;
+1451 .: 
+1452 .:       declare
+1453 -:          L : List renames Position.Container.all;
+1454 .:       begin
+1455 -:          if L.Length = 0 then
+1456 -:             return False;
+1457 .:          end if;
+1458 .: 
+1459 -:          if L.First = null then
+1460 -:             return False;
+1461 .:          end if;
+1462 .: 
+1463 -:          if L.Last = null then
+1464 -:             return False;
+1465 .:          end if;
+1466 .: 
+1467 -:          if L.First.Prev /= null then
+1468 -:             return False;
+1469 .:          end if;
+1470 .: 
+1471 -:          if L.Last.Next /= null then
+1472 -:             return False;
+1473 .:          end if;
+1474 .: 
+1475 -:          if Position.Node.Prev = null
+1476 -:            and then Position.Node /= L.First
+1477 .:          then
+1478 -:             return False;
+1479 .:          end if;
+1480 .: 
+1481 -:          if Position.Node.Next = null
+1482 -:            and then Position.Node /= L.Last
+1483 .:          then
+1484 -:             return False;
+1485 .:          end if;
+1486 .: 
+1487 -:          if L.Length = 1 then
+1488 -:             return L.First = L.Last;
+1489 .:          end if;
+1490 .: 
+1491 -:          if L.First = L.Last then
+1492 -:             return False;
+1493 .:          end if;
+1494 .: 
+1495 -:          if L.First.Next = null then
+1496 -:             return False;
+1497 .:          end if;
+1498 .: 
+1499 -:          if L.Last.Prev = null then
+1500 -:             return False;
+1501 .:          end if;
+1502 .: 
+1503 -:          if L.First.Next.Prev /= L.First then
+1504 -:             return False;
+1505 .:          end if;
+1506 .: 
+1507 -:          if L.Last.Prev.Next /= L.Last then
+1508 -:             return False;
+1509 .:          end if;
+1510 .: 
+1511 -:          if L.Length = 2 then
+1512 -:             if L.First.Next /= L.Last then
+1513 -:                return False;
+1514 .:             end if;
+1515 .: 
+1516 -:             if L.Last.Prev /= L.First then
+1517 -:                return False;
+1518 .:             end if;
+1519 .: 
+1520 -:             return True;
+1521 .:          end if;
+1522 .: 
+1523 -:          if L.First.Next = L.Last then
+1524 -:             return False;
+1525 .:          end if;
+1526 .: 
+1527 -:          if L.Last.Prev = L.First then
+1528 -:             return False;
+1529 .:          end if;
+1530 .: 
+1531 -:          if Position.Node = L.First then
+1532 -:             return True;
+1533 .:          end if;
+1534 .: 
+1535 -:          if Position.Node = L.Last then
+1536 -:             return True;
+1537 .:          end if;
+1538 .: 
+1539 -:          if Position.Node.Next = null then
+1540 -:             return False;
+1541 .:          end if;
+1542 .: 
+1543 -:          if Position.Node.Prev = null then
+1544 -:             return False;
+1545 .:          end if;
+1546 .: 
+1547 -:          if Position.Node.Next.Prev /= Position.Node then
+1548 -:             return False;
+1549 .:          end if;
+1550 .: 
+1551 -:          if Position.Node.Prev.Next /= Position.Node then
+1552 -:             return False;
+1553 .:          end if;
+1554 .: 
+1555 -:          if L.Length = 3 then
+1556 -:             if L.First.Next /= Position.Node then
+1557 -:                return False;
+1558 .:             end if;
+1559 .: 
+1560 -:             if L.Last.Prev /= Position.Node then
+1561 -:                return False;
+1562 .:             end if;
+1563 .:          end if;
+1564 .: 
+1565 -:          return True;
+1566 .:       end;
+1567 .:    end Vet;
+1568 .: 
+1569 .: end Ada_Containers.AUnit_Lists;

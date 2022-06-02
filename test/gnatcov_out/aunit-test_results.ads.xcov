@@ -1,0 +1,151 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-test_results.ads:
+0% of 26 lines covered
+0% statement coverage (0 out of 26)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                    A U N I T . T E S T _ R E S U L T S                   --
+   6 .: --                                                                          --
+   7 .: --                                 S p e c                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                       Copyright (C) 2000-2011, AdaCore                   --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: with Ada_Containers.AUnit_Lists;
+  33 .: 
+  34 .: with AUnit.Time_Measure; use AUnit.Time_Measure;
+  35 .: 
+  36 .: --  Test reporting
+  37 .: --
+  38 .: package AUnit.Test_Results is
+  39 .: 
+  40 -:    type Result is tagged limited private;
+  41 .:    --  Record result. A result object is associated with the execution of a
+  42 .:    --  top-level test suite
+  43 .: 
+  44 -:    type Test_Failure is record
+  45 -:       Message     : Message_String;
+  46 -:       Source_Name : Message_String;
+  47 -:       Line        : Natural;
+  48 -:    end record;
+  49 -:    type Test_Failure_Access is access all Test_Failure;
+  50 .:    pragma No_Strict_Aliasing (Test_Failure_Access);
+  51 .:    --  Description of a test routine failure
+  52 .: 
+  53 -:    type Test_Error is record
+  54 -:       Exception_Name    : Message_String;
+  55 -:       Exception_Message : Message_String;
+  56 -:       Traceback         : Message_String;
+  57 -:    end record;
+  58 -:    type Test_Error_Access is access all Test_Error;
+  59 .:    pragma No_Strict_Aliasing (Test_Error_Access);
+  60 .:    --  Description of unexpected exceptions
+  61 .: 
+  62 -:    type Test_Result is record
+  63 -:       Test_Name    : Message_String;
+  64 -:       Routine_Name : Message_String;
+  65 -:       Failure      : Test_Failure_Access;
+  66 -:       Error        : Test_Error_Access;
+  67 -:       Elapsed      : Time := Null_Time;
+  68 -:    end record;
+  69 .:    --  Decription of a test routine result
+  70 .: 
+  71 .:    use Ada_Containers;
+  72 .: 
+  73 -:    package Result_Lists is new Ada_Containers.AUnit_Lists (Test_Result);
+  74 .:    --  Containers for all test results
+  75 .: 
+  76 .:    procedure Add_Error
+  77 .:      (R            : in out Result;
+  78 .:       Test_Name    : Message_String;
+  79 .:       Routine_Name : Message_String;
+  80 .:       Error        : Test_Error;
+  81 .:       Elapsed      : Time);
+  82 .:    --  Record an unexpected exception
+  83 .: 
+  84 .:    procedure Add_Failure
+  85 .:      (R            : in out Result;
+  86 .:       Test_Name    : Message_String;
+  87 .:       Routine_Name : Message_String;
+  88 .:       Failure      : Test_Failure;
+  89 .:       Elapsed      : Time);
+  90 .:    --  Record a test routine failure
+  91 .: 
+  92 .:    procedure Add_Success
+  93 .:      (R            : in out Result;
+  94 .:       Test_Name    : Message_String;
+  95 .:       Routine_Name : Message_String;
+  96 .:       Elapsed      : Time);
+  97 .:    --  Record a test routine success
+  98 .: 
+  99 .:    procedure Set_Elapsed (R : in out Result; T : Time);
+ 100 .:    --  Set Elapsed time for reporter
+ 101 .: 
+ 102 .:    function Error_Count (R : Result) return Count_Type;
+ 103 .:    --  Number of routines with unexpected exceptions
+ 104 .: 
+ 105 .:    procedure Errors (R : Result;
+ 106 .:                      E : in out Result_Lists.List);
+ 107 .:    --  List of routines with unexpected exceptions
+ 108 .: 
+ 109 .:    function Failure_Count (R : Result) return Count_Type;
+ 110 .:    --  Number of failed routines
+ 111 .: 
+ 112 .:    procedure Failures (R : Result; F : in out Result_Lists.List);
+ 113 .:    --  List of failed routines
+ 114 .: 
+ 115 .:    function Elapsed (R : Result) return Time;
+ 116 .:    --  Elapsed time for test execution
+ 117 .: 
+ 118 .:    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
+ 119 .:    --  Set count for a test run
+ 120 .: 
+ 121 .:    function Success_Count (R : Result) return Count_Type;
+ 122 .:    --  Number of successful routines
+ 123 .: 
+ 124 .:    procedure Successes (R : Result; S : in out Result_Lists.List);
+ 125 .:    --  List of successful routines
+ 126 .: 
+ 127 .:    function Successful (R : Result) return Boolean;
+ 128 .:    --  All routines successful?
+ 129 .: 
+ 130 .:    function Test_Count (R : Result) return Ada_Containers.Count_Type;
+ 131 .:    --  Number of routines run
+ 132 .: 
+ 133 .:    procedure Clear (R : in out Result);
+ 134 .:    --  Clear the results
+ 135 .: 
+ 136 .: private
+ 137 .: 
+ 138 .:    pragma Inline (Errors, Failures, Successes);
+ 139 .: 
+ 140 -:    type Result is tagged limited record
+ 141 -:       Tests_Run    : Count_Type := 0;
+ 142 -:       Result_List  : Result_Lists.List;
+ 143 -:       Elapsed_Time : Time := Null_Time;
+ 144 -:    end record;
+ 145 .: 
+ 146 .: end AUnit.Test_Results;

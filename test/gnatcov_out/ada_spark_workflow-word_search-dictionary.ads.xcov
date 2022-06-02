@@ -1,0 +1,47 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/src/ada_spark_workflow-word_search-dictionary.ads:
+100% of 9 lines covered
+100% statement coverage (9 out of 9)
+
+Coverage level: stmt
+   1 .: with Ada.Containers;
+   2 .: 
+   3 .: with Ada_SPARK_Workflow.Word_Search.Word;
+   4 .: 
+   5 .: private with Ada_SPARK_Workflow.Word_Search.Word_Vector;
+   6 .: 
+   7 .: package Ada_SPARK_Workflow.Word_Search.Dictionary
+   8 .: with SPARK_Mode
+   9 .: is
+  10 .: 
+  11 +:    type Instance (Capacity : Ada.Containers.Count_Type)
+  12 +:    is tagged limited
+  13 +:    private;
+  14 .: 
+  15 +:    Builtin_Dict_Words : constant := 25103;
+  16 .: 
+  17 .:    procedure Load (This : in out Instance;
+  18 .:                    Min_Word_Len, Max_Word_Len : Positive);
+  19 .:    --  Load words from built-in dictionary
+  20 .: 
+  21 .:    function Is_Empty (This : Instance) return Boolean;
+  22 .:    --  Return true if there is no more word in the dictionary
+  23 .: 
+  24 .:    procedure Pop_Last (This : in out Instance; W : out Word.Instance)
+  25 .:      with Pre'Class => not This.Is_Empty;
+  26 .:    --  Remove the last Word from the dictionary and return it
+  27 .: 
+  28 .:    procedure Random_Shuffle (This : in out Instance);
+  29 .:    --  Shuffle words of the dictionary in random order
+  30 .: 
+  31 .:    procedure Print (This : Instance);
+  32 .:    --  Print all words on stdout
+  33 .: 
+  34 .: private
+  35 .: 
+  36 +:    type Instance (Capacity : Ada.Containers.Count_Type)
+  37 +:    is tagged limited
+  38 +:       record
+  39 +:          Words : Word_Vector.Vector (Capacity);
+  40 +:       end record;
+  41 .: 
+  42 .: end Ada_SPARK_Workflow.Word_Search.Dictionary;

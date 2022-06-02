@@ -1,0 +1,84 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/src/ada_spark_workflow-word_search-puzzle.ads:
+100% of 24 lines covered
+100% statement coverage (24 out of 24)
+
+Coverage level: stmt
+   1 .: with Ada_SPARK_Workflow.Word_Search.Word;
+   2 .: with Ada_SPARK_Workflow.Word_Search.Solution;
+   3 .: with Ada_SPARK_Workflow.Word_Search.Dictionary;
+   4 .: 
+   5 .: with Ada.Containers;
+   6 .: 
+   7 .: package Ada_SPARK_Workflow.Word_Search.Puzzle
+   8 .: with SPARK_Mode
+   9 .: is
+  10 .: 
+  11 +:    subtype Grid_Size is Positive range Positive'First .. 10_000;
+  12 .: 
+  13 +:    type Instance (Width, Height : Grid_Size;
+  14 +:                   Max_Words : Ada.Containers.Count_Type)
+  15 +:    is tagged
+  16 +:    private;
+  17 .: 
+  18 .:    procedure Create (This : in out Instance;
+  19 .:                      Dict : in out Dictionary.Instance);
+  20 .:    --  Create a Word Search Puzzle from provided dictionary
+  21 .: 
+  22 .:    procedure Print (This : Instance);
+  23 .: 
+  24 .:    function Solution (This : Instance) return Word_Search.Solution.Instance;
+  25 .: 
+  26 .: private
+  27 .: 
+  28 .:    use type Ada.Containers.Count_Type;
+  29 .: 
+  30 +:    Empty_Cell : constant Character := ' ';
+  31 .: 
+  32 +:    type Puzzle_Grid is array (Grid_Size range <>,
+  33 +:                               Grid_Size range <>)
+  34 +:      of Character;
+  35 .: 
+  36 +:    type Instance (Width, Height : Grid_Size;
+  37 +:                   Max_Words : Ada.Containers.Count_Type)
+  38 +:    is tagged
+  39 +:       record
+  40 +:          Grid : Puzzle_Grid (1 .. Width, 1 .. Height) :=
+  41 +:            (others => (others => Empty_Cell));
+  42 +: 
+  43 +:          Sol :  Word_Search.Solution.Instance (Max_Words);
+  44 +:       end record;
+  45 .: 
+  46 .:    function Used_Count (This : Instance) return Ada.Containers.Count_Type
+  47 +:    is (Word_Search.Solution.Word_Count (This.Sol));
+  48 .: 
+  49 .:    function Complete (This : Instance) return Boolean
+  50 +:    is (This.Max_Words = This.Used_Count);
+  51 .:    --  Return True if the puzzle is complete, i.e. Max_Words are inserted in
+  52 .:    --  the puzzle.
+  53 .: 
+  54 .:    function Empty_Cells (This : Instance) return Boolean;
+  55 .:    --  Return True if at least one of the puzzel cell is empty
+  56 .: 
+  57 .:    procedure Add_Word (This    : in out Instance;
+  58 .:                        W       :        Word.Instance;
+  59 .:                        Success :    out Boolean);
+  60 .:    --  Add a Word in the grid
+  61 .: 
+  62 +:    type Direction is (North, North_East,
+  63 +:                       East, South_East,
+  64 +:                       South, South_West,
+  65 +:                       West, North_West);
+  66 .: 
+  67 .:    procedure Try_Set_Word (This    : in out Instance;
+  68 .:                            W       :        Word.Instance;
+  69 .:                            XS, YS  :        Positive;
+  70 .:                            Dir     :        Direction;
+  71 .:                            Success :    out Boolean)
+  72 .:      with Pre'Class => This.Used_Count < This.Max_Words
+  73 .:                        and then XS <= This.Grid'Last (1)
+  74 .:                        and then YS <= This.Grid'Last (2);
+  75 .: 
+  76 .:    procedure Fill_Empty (This : in out Instance);
+  77 .:    --  Fill empty cells with random characters
+  78 .: 
+  79 .: end Ada_SPARK_Workflow.Word_Search.Puzzle;

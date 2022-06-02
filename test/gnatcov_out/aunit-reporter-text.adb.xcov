@@ -1,0 +1,286 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/reporters/aunit-reporter-text.adb:
+0% of 96 lines covered
+0% statement coverage (0 out of 96)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                   A U N I T . R E P O R T E R . T E X T                  --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                       Copyright (C) 2000-2019, AdaCore                   --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: with AUnit.IO;           use AUnit.IO;
+  33 .: with AUnit.Time_Measure; use AUnit.Time_Measure;
+  34 .: 
+  35 .: --  Very simple reporter to console
+  36 .: package body AUnit.Reporter.Text is
+  37 .: 
+  38 .:    procedure Indent (File : File_Type; N : Natural);
+  39 .:    --  Print N indentations to output
+  40 .: 
+  41 .:    procedure Dump_Result_List (File : File_Type; L : Result_Lists.List; Prefix : String);
+  42 .:    --  Dump a result list
+  43 .: 
+  44 -:    procedure Put_Measure is new Gen_Put_Measure;
+  45 .:    --  Output elapsed time
+  46 .: 
+  47 .:    procedure Report_Test (File : File_Type; Test : Test_Result; Prefix : String);
+  48 .:    --  Report a single assertion failure or unexpected exception
+  49 .: 
+  50 .:    generic
+  51 .:       with procedure Get (R : Result; L : in out Result_Lists.List);
+  52 .:       Label : String;
+  53 .:       Color : String;
+  54 .:    procedure Report_Tests
+  55 .:       (Engine : Text_Reporter;
+  56 .:        R      : Result'Class;
+  57 .:        File   : File_Type);
+  58 .:    --  Report a series of tests
+  59 .: 
+  60 -:    ANSI_Def    : constant String := ASCII.ESC & "[0m";
+  61 -:    ANSI_Green  : constant String := ASCII.ESC & "[32m";
+  62 -:    ANSI_Purple : constant String := ASCII.ESC & "[35m";
+  63 -:    ANSI_Red    : constant String := ASCII.ESC & "[31m";
+  64 .: 
+  65 .:    -------------------------
+  66 .:    -- Set_Use_ANSI_Colors --
+  67 .:    -------------------------
+  68 .: 
+  69 .:    procedure Set_Use_ANSI_Colors
+  70 .:      (Engine : in out Text_Reporter;
+  71 .:       Value  : Boolean) is
+  72 .:    begin
+  73 -:       Engine.Use_ANSI := Value;
+  74 .:    end Set_Use_ANSI_Colors;
+  75 .: 
+  76 .:    ------------
+  77 .:    -- Indent --
+  78 .:    ------------
+  79 .: 
+  80 .:    procedure Indent (File : File_Type; N : Natural) is
+  81 .:    begin
+  82 -:       for J in 1 .. N loop
+  83 -:          Put (File, "    ");
+  84 .:       end loop;
+  85 .:    end Indent;
+  86 .: 
+  87 .:    ----------------------
+  88 .:    -- Dump_Result_List --
+  89 .:    ----------------------
+  90 .: 
+  91 .:    procedure Dump_Result_List (File : File_Type; L : Result_Lists.List; Prefix : String) is
+  92 .: 
+  93 .:       use Result_Lists;
+  94 .: 
+  95 -:       C : Cursor := First (L);
+  96 .:    begin
+  97 -:       if Has_Element (C) then
+  98 -:          New_Line (File);
+  99 .:       end if;
+ 100 .: 
+ 101 .:       --  Note: can't use Iterate because it violates restriction
+ 102 .:       --  No_Implicit_Dynamic_Code
+ 103 .: 
+ 104 -:       while Has_Element (C) loop
+ 105 -:          Report_Test (File, Element (C), Prefix);
+ 106 -:          Next (C);
+ 107 .:       end loop;
+ 108 .:    end Dump_Result_List;
+ 109 .: 
+ 110 .:    ---------
+ 111 .:    -- Get --
+ 112 .:    ---------
+ 113 .: 
+ 114 .:    procedure Report_Tests
+ 115 .:       (Engine : Text_Reporter;
+ 116 .:        R      : Result'Class;
+ 117 .:        File   : File_Type)
+ 118 .:    is
+ 119 -:       S : Result_Lists.List;
+ 120 .:    begin
+ 121 -:       Get (Result (R), S);
+ 122 -:       if Engine.Use_ANSI then
+ 123 -:          Put (File, Color);
+ 124 .:       end if;
+ 125 .: 
+ 126 -:       Dump_Result_List (File, S, Label);
+ 127 .: 
+ 128 -:       if Engine.Use_ANSI then
+ 129 -:          Put (File, ANSI_Def);
+ 130 .:       end if;
+ 131 .:    end Report_Tests;
+ 132 .: 
+ 133 .:    ---------------------
+ 134 .:    -- Report_OK_Tests --
+ 135 .:    ---------------------
+ 136 .: 
+ 137 .:    procedure Report_OK_Tests
+ 138 .:       (Engine : Text_Reporter;
+ 139 .:        R      : Result'Class)
+ 140 .:    is
+ 141 -:       procedure Internal is new Report_Tests (Successes, "OK", ANSI_Green);
+ 142 .:    begin
+ 143 -:       Internal (Engine, R, Engine.File.all);
+ 144 .:    end Report_OK_Tests;
+ 145 .: 
+ 146 .:    procedure Report_Fail_Tests
+ 147 .:       (Engine : Text_Reporter;
+ 148 .:        R      : Result'Class)
+ 149 .:    is
+ 150 -:       procedure Internal is new Report_Tests (Failures, "FAIL", ANSI_Purple);
+ 151 .:    begin
+ 152 -:       Internal (Engine, R, Engine.File.all);
+ 153 .:    end Report_Fail_Tests;
+ 154 .: 
+ 155 .:    procedure Report_Error_Tests
+ 156 .:       (Engine : Text_Reporter;
+ 157 .:        R      : Result'Class)
+ 158 .:    is
+ 159 -:       procedure Internal is new Report_Tests (Errors, "ERROR", ANSI_Red);
+ 160 .:    begin
+ 161 -:       Internal (Engine, R, Engine.File.all);
+ 162 .:    end Report_Error_Tests;
+ 163 .: 
+ 164 .:    ------------
+ 165 .:    -- Report --
+ 166 .:    ------------
+ 167 .: 
+ 168 .:    procedure Report
+ 169 .:      (Engine  : Text_Reporter;
+ 170 .:       R       : in out Result'Class;
+ 171 .:       Options : AUnit_Options := Default_Options)
+ 172 .:    is
+ 173 -:       File    : File_Type renames Engine.File.all;
+ 174 -:       S_Count : constant Integer := Integer (Success_Count (R));
+ 175 -:       F_Count : constant Integer := Integer (Failure_Count (R));
+ 176 -:       E_Count : constant Integer := Integer (Error_Count (R));
+ 177 -:       T : AUnit_Duration;
+ 178 .:    begin
+ 179 .: 
+ 180 -:       if Options.Report_Successes then
+ 181 -:          Report_OK_Tests    (Text_Reporter'Class (Engine), R);
+ 182 .:       end if;
+ 183 .: 
+ 184 -:       Report_Fail_Tests  (Text_Reporter'Class (Engine), R);
+ 185 -:       Report_Error_Tests (Text_Reporter'Class (Engine), R);
+ 186 .: 
+ 187 -:       New_Line (File);
+ 188 -:       Put (File, "Total Tests Run:   ");
+ 189 -:       Put (File, Integer (Test_Count (R)), 0);
+ 190 -:       New_Line (File);
+ 191 -:       Put (File, "Successful Tests:  ");
+ 192 -:       Put (File, S_Count, 0);
+ 193 -:       New_Line (File);
+ 194 -:       Put (File, "Failed Assertions: ");
+ 195 -:       Put (File, F_Count, 0);
+ 196 -:       New_Line (File);
+ 197 -:       Put (File, "Unexpected Errors: ");
+ 198 -:       Put (File, E_Count, 0);
+ 199 -:       New_Line (File);
+ 200 .: 
+ 201 -:       if Elapsed (R) /= Time_Measure.Null_Time then
+ 202 -:          T := Get_Measure (Elapsed (R));
+ 203 .: 
+ 204 -:          Put (File, "Cumulative Time: ");
+ 205 -:          Put_Measure (File, T);
+ 206 -:          Put_Line (File, " seconds");
+ 207 .:       end if;
+ 208 .:    end Report;
+ 209 .: 
+ 210 .:    -----------------
+ 211 .:    -- Report_Test --
+ 212 .:    -----------------
+ 213 .: 
+ 214 .:    procedure Report_Test (File : File_Type; Test : Test_Result; Prefix : String) is
+ 215 -:       T : AUnit_Duration;
+ 216 .:    begin
+ 217 -:       Put (File, Prefix);
+ 218 -:       Put (File, " ");
+ 219 -:       Put (File, Test.Test_Name.all);
+ 220 .: 
+ 221 -:       if Test.Routine_Name /= null then
+ 222 -:          Put (File, " : ");
+ 223 -:          Put (File, Test.Routine_Name.all);
+ 224 .:       end if;
+ 225 .: 
+ 226 -:       if Test.Elapsed /= Time_Measure.Null_Time then
+ 227 -:          Put (File, " (in ");
+ 228 -:          T := Get_Measure (Test.Elapsed);
+ 229 -:          Put_Measure (File, T);
+ 230 -:          Put (File, ")");
+ 231 .:       end if;
+ 232 .: 
+ 233 -:       New_Line (File);
+ 234 .: 
+ 235 -:       if Test.Failure /= null then
+ 236 -:          Indent (File, 1);
+ 237 -:          Put_Line (File, Test.Failure.Message.all);
+ 238 -:          Indent (File, 1);
+ 239 -:          Put (File, "at ");
+ 240 -:          Put (File, Test.Failure.Source_Name.all);
+ 241 -:          Put (File, ":");
+ 242 -:          Put (File, Integer (Test.Failure.Line), 0);
+ 243 -:          New_Line (File);
+ 244 .: 
+ 245 -:       elsif Test.Error /= null then
+ 246 -:          Indent (File, 1);
+ 247 -:          Put_Line (File, Test.Error.Exception_Name.all);
+ 248 .: 
+ 249 -:          if Test.Error.Exception_Message /= null then
+ 250 -:             Indent (File, 1);
+ 251 -:             Put      (File, "Exception Message: ");
+ 252 -:             Put_Line (File, Test.Error.Exception_Message.all);
+ 253 .:          end if;
+ 254 .: 
+ 255 -:          if Test.Error.Traceback /= null then
+ 256 -:             Indent (File, 1);
+ 257 -:             Put_Line (File, "Traceback:");
+ 258 .: 
+ 259 .:             declare
+ 260 -:                From, To : Natural := Test.Error.Traceback'First;
+ 261 .:             begin
+ 262 -:                while From <= Test.Error.Traceback'Last loop
+ 263 -:                   To := From;
+ 264 -:                   while To <= Test.Error.Traceback'Last
+ 265 -:                     and then Test.Error.Traceback (To) /= ASCII.LF
+ 266 .:                   loop
+ 267 -:                      To := To + 1;
+ 268 .:                   end loop;
+ 269 .: 
+ 270 -:                   Indent (File, 2);
+ 271 -:                   Put_Line (File, Test.Error.Traceback (From .. To - 1));
+ 272 -:                   From := To + 1;
+ 273 .:                end loop;
+ 274 .:             end;
+ 275 .:          end if;
+ 276 .: 
+ 277 -:          New_Line (File);
+ 278 .:       end if;
+ 279 .:    end Report_Test;
+ 280 .: 
+ 281 .: end AUnit.Reporter.Text;

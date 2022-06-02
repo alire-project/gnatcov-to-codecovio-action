@@ -1,0 +1,58 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-memory.ads:
+0% of 1 lines covered
+0% statement coverage (0 out of 1)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                         A U N I T . M E M O R Y                          --
+   6 .: --                                                                          --
+   7 .: --                                 S p e c                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                     Copyright (C) 2008-2011, AdaCore                     --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: --  Provides the memory handling mechanism used by AUnit. This allows in
+  33 .: --  particular AUnit to use dynamic allocation even on limited run-times that
+  34 .: --  do not provide memory management.
+  35 .: --  See also AUnit.Memory.Utils that provides an easy to use allocator for
+  36 .: --  complex objects.
+  37 .: 
+  38 .: with System;
+  39 .: 
+  40 .: package AUnit.Memory is
+  41 .: 
+  42 -:    type size_t is mod 2 ** Standard'Address_Size;
+  43 .: 
+  44 .:    function AUnit_Alloc (Size : size_t) return System.Address;
+  45 .: 
+  46 .:    procedure AUnit_Free (Obj : System.Address);
+  47 .: 
+  48 .: private
+  49 .: 
+  50 .:    pragma Inline (AUnit_Alloc);
+  51 .:    pragma Inline (AUnit_Free);
+  52 .: 
+  53 .: end AUnit.Memory;

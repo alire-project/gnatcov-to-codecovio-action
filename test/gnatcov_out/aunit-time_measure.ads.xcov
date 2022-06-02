@@ -1,0 +1,76 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/calendar/aunit-time_measure.ads:
+0% of 8 lines covered
+0% statement coverage (0 out of 8)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                     A U N I T . T I M E _ M E A S U R E                  --
+   6 .: --                                                                          --
+   7 .: --                                 S p e c                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                    Copyright (C) 2006-2019, AdaCore                      --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: with Ada.Calendar;
+  33 .: with AUnit.IO;
+  34 .: 
+  35 .: package AUnit.Time_Measure is
+  36 .: 
+  37 -:    type Time is record
+  38 -:       Start : Ada.Calendar.Time;
+  39 -:       Stop  : Ada.Calendar.Time;
+  40 -:    end record;
+  41 .: 
+  42 -:    type AUnit_Duration is private;
+  43 .: 
+  44 -:    Null_Time : constant Time := (Start => Ada.Calendar.Time_Of (1901, 1, 1),
+  45 -:                                  Stop  => Ada.Calendar.Time_Of (1901, 1, 1));
+  46 .: 
+  47 .:    procedure Start_Measure (T : in out Time);
+  48 .:    --  Start a new measure
+  49 .: 
+  50 .:    procedure Stop_Measure (T : in out Time);
+  51 .:    --  Stop the measure
+  52 .: 
+  53 .:    function Get_Measure (T : Time) return AUnit_Duration;
+  54 .:    --  Get the measure
+  55 .: 
+  56 .:    generic
+  57 .:       with procedure Put (F : AUnit.IO.File_Type; S : String) is <>;
+  58 .:    procedure Gen_Put_Measure (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
+  59 .:    --  Put the image of the measure
+  60 .: 
+  61 .:    generic
+  62 .:       with procedure Put (F : AUnit.IO.File_Type; S : String) is <>;
+  63 .:    procedure Gen_Put_Measure_In_Seconds (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
+  64 .:    --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
+  65 .:    --  9 digits after decimal point.
+  66 .: 
+  67 .: private
+  68 .: 
+  69 -:    type AUnit_Duration is new Duration;
+  70 .: 
+  71 .: end AUnit.Time_Measure;

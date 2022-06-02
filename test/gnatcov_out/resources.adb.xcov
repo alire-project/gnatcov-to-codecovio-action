@@ -1,0 +1,128 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/pins/resources/src/resources.adb:
+46% of 26 lines covered
+46% statement coverage (12 out of 26)
+
+Coverage level: stmt
+   1 .: with Ada.Characters.Handling;
+   2 .: 
+   3 .: with GNAT.OS_Lib;
+   4 .: with GNAT.Strings;
+   5 .: 
+   6 .: with System;
+   7 .: 
+   8 .: with Interfaces.C;
+   9 .: 
+  10 .: package body Resources is
+  11 .: 
+  12 .:    function WAI_getExecutablePath
+  13 .:      (Output      : System.Address;
+  14 .:       Capacity    : Interfaces.C.int;
+  15 .:       Dirname_Len : access Interfaces.C.int)
+  16 .:       return Interfaces.C.int;
+  17 .:    pragma Import (C, WAI_getExecutablePath, "wai_alire_getExecutablePath");
+  18 .:    pragma Unreferenced (WAI_getExecutablePath);
+  19 .: 
+  20 .:    function WAI_getModulePath
+  21 .:      (Output      : System.Address;
+  22 .:       Capacity    : Interfaces.C.int;
+  23 .:       Dirname_Len : access Interfaces.C.int)
+  24 .:       return Interfaces.C.int;
+  25 .:    pragma Import (C, WAI_getModulePath, "wai_alire_getModulePath");
+  26 .: 
+  27 .:    function Get_Prefix_From_Env return String;
+  28 .:    function Get_Prefix return String;
+  29 .: 
+  30 .:    -----------------
+  31 .:    -- Module_Path --
+  32 .:    -----------------
+  33 .: 
+  34 .:    function Module_Path return String is
+  35 .:       use Interfaces.C;
+  36 .:       use System;
+  37 .: 
+  38 -:       Expected_Len : int;
+  39 .:    begin
+  40 .: 
+  41 .:       --  First get the output length
+  42 -:       Expected_Len := WAI_getModulePath (Null_Address, 0, null);
+  43 .: 
+  44 -:       if Expected_Len > 0 then
+  45 .:          declare
+  46 -:             Dirname_Len : aliased int;
+  47 -:             Output : String (1 .. Natural (Expected_Len));
+  48 -:             Len : constant int :=  WAI_getModulePath (Output'Address,
+  49 -:                                                       Output'Length,
+  50 -:                                                       Dirname_Len'Access);
+  51 .:          begin
+  52 -:             if Len = Expected_Len then
+  53 -:                return Output (1 .. Natural (Dirname_Len));
+  54 .:             else
+  55 -:                raise Program_Error;
+  56 .:             end if;
+  57 .:          end;
+  58 .:       else
+  59 .: 
+  60 .:          --  We don't have any fallback if the module path cannot be retrieved
+  61 -:          raise Program_Error;
+  62 .:       end if;
+  63 .:    end Module_Path;
+  64 .: 
+  65 .:    -------------------------
+  66 .:    -- Get_Prefix_From_Env --
+  67 .:    -------------------------
+  68 .: 
+  69 .:    function Get_Prefix_From_Env return String is
+  70 .:       use Ada.Characters.Handling;
+  71 .:       use GNAT.Strings;
+  72 .: 
+  73 +:       Env_Prefix : GNAT.Strings.String_Access :=
+  74 +:         GNAT.OS_Lib.Getenv (To_Upper (Crate_Name) & "_ALIRE_PREFIX");
+  75 .: 
+  76 .:    begin
+  77 .: 
+  78 +:       if Env_Prefix /= null then
+  79 +:          return Result : String (1 .. Env_Prefix.all'Length) do
+  80 +:             Result := Env_Prefix.all;
+  81 +:             GNAT.Strings.Free (Env_Prefix);
+  82 .:          end return;
+  83 .:       else
+  84 .: 
+  85 -:          return "";
+  86 .:       end if;
+  87 .:    end Get_Prefix_From_Env;
+  88 .: 
+  89 .:    ----------------
+  90 .:    -- Get_Prefix --
+  91 .:    ----------------
+  92 .: 
+  93 .:    function Get_Prefix return String is
+  94 +:       From_Env : constant String := Get_Prefix_From_Env;
+  95 .:    begin
+  96 +:       if From_Env /= "" then
+  97 +:          return From_Env & "/";
+  98 .:       else
+  99 -:          return Module_Path & "/" & Module_To_Prefix & "/";
+ 100 .:       end if;
+ 101 .:    end Get_Prefix;
+ 102 .: 
+ 103 +:    Elab_Prefix_Path : constant String := Get_Prefix;
+ 104 .: 
+ 105 .:    -----------------
+ 106 .:    -- Prefix_Path --
+ 107 .:    -----------------
+ 108 .: 
+ 109 .:    function Prefix_Path return String is
+ 110 .:    begin
+ 111 +:       return Elab_Prefix_Path;
+ 112 .:    end Prefix_Path;
+ 113 .: 
+ 114 .:    -------------------
+ 115 .:    -- Resource_Path --
+ 116 .:    -------------------
+ 117 .: 
+ 118 .:    function Resource_Path return String is
+ 119 .:    begin
+ 120 +:       return Prefix_Path & Resource_Dir_From_Prefix;
+ 121 .:    end Resource_Path;
+ 122 .: 
+ 123 .: end Resources;

@@ -1,0 +1,100 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-test_filters.adb:
+0% of 20 lines covered
+0% statement coverage (0 out of 20)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                    A U N I T . T E S T _ F I L T E R S                   --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --                   Copyright (C) 2009-2011, AdaCore                       --
+  10 .: --                                                                          --
+  11 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  12 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  13 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  14 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  15 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  16 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  17 .: --                                                                          --
+  18 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  19 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  20 .: -- version 3.1, as published by the Free Software Foundation.               --
+  21 .: --                                                                          --
+  22 .: -- You should have received a copy of the GNU General Public License and    --
+  23 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  24 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  25 .: -- <http://www.gnu.org/licenses/>.                                          --
+  26 .: --                                                                          --
+  27 .: -- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+  28 .: --                                                                          --
+  29 .: ------------------------------------------------------------------------------
+  30 .: 
+  31 .: with AUnit.Simple_Test_Cases;  use AUnit.Simple_Test_Cases;
+  32 .: 
+  33 .: package body AUnit.Test_Filters is
+  34 .: 
+  35 .:    function Starts_With (Str : String; Prefix : String) return Boolean;
+  36 .:    --  Whether Str starts with Prefix
+  37 .: 
+  38 .:    -----------------
+  39 .:    -- Starts_With --
+  40 .:    -----------------
+  41 .: 
+  42 .:    function Starts_With (Str : String; Prefix : String) return Boolean is
+  43 .:    begin
+  44 -:       if Str'Length < Prefix'Length then
+  45 -:          return False;
+  46 .:       end if;
+  47 .: 
+  48 -:       return Str (Str'First .. Str'First + Prefix'Length - 1) = Prefix;
+  49 .:    end Starts_With;
+  50 .: 
+  51 .:    --------------
+  52 .:    -- Set_Name --
+  53 .:    --------------
+  54 .: 
+  55 .:    procedure Set_Name (Filter : in out Name_Filter; Name : String) is
+  56 .:    begin
+  57 -:       Message_Free (Filter.Name);
+  58 -:       Filter.Name := Format (Name);
+  59 .:    end Set_Name;
+  60 .: 
+  61 .:    ---------------
+  62 .:    -- Is_Active --
+  63 .:    ---------------
+  64 .: 
+  65 .:    function Is_Active
+  66 .:      (Filter : Name_Filter;
+  67 .:       T      : AUnit.Tests.Test'Class) return Boolean is
+  68 .:    begin
+  69 -:       if Filter.Name = null
+  70 -:         or else Filter.Name.all = ""
+  71 .:       then
+  72 -:          return True;
+  73 .:       end if;
+  74 .: 
+  75 -:       if T not in AUnit.Simple_Test_Cases.Test_Case'Class
+  76 -:         or else Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null
+  77 .:       then
+  78 .:          --  There is no name, so it doesn't match the filter
+  79 -:          return False;
+  80 .:       end if;
+  81 .: 
+  82 -:       if Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null then
+  83 -:          return Starts_With
+  84 -:            (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+  85 -:             Filter.Name.all);
+  86 .:       else
+  87 -:          return Starts_With
+  88 -:            (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+  89 -:             & " : "
+  90 -:             & Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+  91 -:             Filter.Name.all);
+  92 .:       end if;
+  93 .:    end Is_Active;
+  94 .: 
+  95 .: end AUnit.Test_Filters;

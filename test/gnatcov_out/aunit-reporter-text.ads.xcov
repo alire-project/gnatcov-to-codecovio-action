@@ -1,0 +1,71 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/reporters/aunit-reporter-text.ads:
+0% of 4 lines covered
+0% statement coverage (0 out of 4)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                   A U N I T . R E P O R T E R . T E X T                  --
+   6 .: --                                                                          --
+   7 .: --                                 S p e c                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                      Copyright (C) 2000-2013, AdaCore                    --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: --  Very simple reporter to console
+  33 .: package AUnit.Reporter.Text is
+  34 .: 
+  35 -:    type Text_Reporter is new Reporter with private;
+  36 .: 
+  37 .:    procedure Set_Use_ANSI_Colors
+  38 .:      (Engine : in out Text_Reporter;
+  39 .:       Value  : Boolean);
+  40 .:    --  Setting this value will enable colors output on an ANSI compatible
+  41 .:    --  terminal.
+  42 .:    --  By default, no color is used.
+  43 .: 
+  44 .:    procedure Report (Engine  : Text_Reporter;
+  45 .:                      R       : in out Result'Class;
+  46 .:                      Options : AUnit_Options := Default_Options);
+  47 .: 
+  48 .:    procedure Report_OK_Tests (Engine : Text_Reporter;
+  49 .:                               R      : Result'Class);
+  50 .:    procedure Report_Fail_Tests (Engine : Text_Reporter;
+  51 .:                                 R      : Result'Class);
+  52 .:    procedure Report_Error_Tests (Engine : Text_Reporter;
+  53 .:                                  R      : Result'Class);
+  54 .:    --  These subprograms implement the various parts of the Report. You
+  55 .:    --  can therefore chose in which order to report the various categories,
+  56 .:    --  and whether or not to report them.
+  57 .:    --  After calling any of these, the list of results has been modified in
+  58 .:    --  R, so you should get the counts first.
+  59 .: 
+  60 .: private
+  61 .: 
+  62 -:    type Text_Reporter is new Reporter with record
+  63 -:       Use_ANSI : Boolean := False;
+  64 -:    end record;
+  65 .: 
+  66 .: end AUnit.Reporter.Text;

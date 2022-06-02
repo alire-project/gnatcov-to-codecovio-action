@@ -1,0 +1,81 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-test_filters.ads:
+0% of 10 lines covered
+0% statement coverage (0 out of 10)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                   A U N I T . T E S T _ F I L T E R S                    --
+   6 .: --                                                                          --
+   7 .: --                                 S p e c                                  --
+   8 .: --                                                                          --
+   9 .: --                     Copyright (C) 2009-2011, AdaCore                     --
+  10 .: --                                                                          --
+  11 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  12 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  13 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  14 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  15 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  16 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  17 .: --                                                                          --
+  18 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  19 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  20 .: -- version 3.1, as published by the Free Software Foundation.               --
+  21 .: --                                                                          --
+  22 .: -- You should have received a copy of the GNU General Public License and    --
+  23 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  24 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  25 .: -- <http://www.gnu.org/licenses/>.                                          --
+  26 .: --                                                                          --
+  27 .: -- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+  28 .: --                                                                          --
+  29 .: ------------------------------------------------------------------------------
+  30 .: 
+  31 .: --  An instance of a test filter.
+  32 .: --  This can be created from command line arguments, for instance, so that
+  33 .: --  users can decide to run specific tests only, as opposed to the whole
+  34 .: --  test suite.
+  35 .: 
+  36 .: with AUnit.Tests;
+  37 .: 
+  38 .: package AUnit.Test_Filters is
+  39 .: 
+  40 -:    type Test_Filter is abstract tagged limited private;
+  41 -:    type Test_Filter_Access is access all Test_Filter'Class;
+  42 -:    function Is_Active
+  43 -:      (Filter : Test_Filter;
+  44 -:       T      : AUnit.Tests.Test'Class) return Boolean is abstract;
+  45 .:    --  Whether we should run the given test. If this function returns False,
+  46 .:    --  the test is not run.
+  47 .: 
+  48 -:    type Name_Filter is new Test_Filter with private;
+  49 .:    --  A filter based on the name of the test and/or routine.
+  50 .: 
+  51 .:    procedure Set_Name
+  52 .:      (Filter : in out Name_Filter; Name : String);
+  53 .:    --  Set the name of the test(s) to run.
+  54 .:    --  The name can take several forms:
+  55 .:    --     * Either the fully qualified name of the test (including routine).
+  56 .:    --       For instance, if you have an instance of
+  57 .:    --       AUnit.Test_Cases.Test_Case, the name could be:
+  58 .:    --          Name (Test) & " : " & Routine_Name (Test)
+  59 .:    --     * Or a partial name, that matches the start of the test_name. With
+  60 .:    --       the example above, you could chose to omit the routine_name to run
+  61 .:    --       all routines for instance
+  62 .:    --  If the name is the empty string, all tests will be run
+  63 .: 
+  64 .:    function Is_Active
+  65 .:      (Filter : Name_Filter;
+  66 .:       T      : AUnit.Tests.Test'Class) return Boolean;
+  67 .:    --  See inherited documentation
+  68 .: 
+  69 .: private
+  70 -:    type Test_Filter is abstract tagged limited null record;
+  71 .: 
+  72 -:    type Name_Filter is new Test_Filter with record
+  73 -:       Name : Message_String;
+  74 -:    end record;
+  75 .: 
+  76 .: end AUnit.Test_Filters;

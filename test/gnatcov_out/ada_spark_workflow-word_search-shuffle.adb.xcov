@@ -1,0 +1,35 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/src/ada_spark_workflow-word_search-shuffle.adb:
+90% of 10 lines covered
+90% statement coverage (9 out of 10)
+
+Coverage level: stmt
+   1 .: with Ada_SPARK_Workflow.Word_Search.RNG;
+   2 .: 
+   3 .: procedure Ada_SPARK_Workflow.Word_Search.Shuffle
+   4 .:   (Vect : in out Vector_Pck.Vector)
+   5 .: is
+   6 .:    use Vector_Pck;
+   7 .: 
+   8 +:    package Index_RNG is new Word_Search.RNG (Index_Type);
+   9 .: 
+  10 +:    Gen : constant Index_RNG.Instance := Index_RNG.Create;
+  11 .: 
+  12 +:    First : constant Index_Type := First_Index (Vect);
+  13 +:    Last  : constant Extended_Index := Last_Index (Vect);
+  14 .: 
+  15 .: begin
+  16 .: 
+  17 +:    if Last not in Index_Type then
+  18 -:       return;
+  19 .:    end if;
+  20 .: 
+  21 +:    for X in First .. Index_Type (Last) loop
+  22 .:       pragma Loop_Invariant (First_Index (Vect) = First);
+  23 .:       pragma Loop_Invariant (Last_Index (Vect) = Last);
+  24 .: 
+  25 +:       Vector_Pck.Swap (Vect,
+  26 +:                        X,
+  27 +:                        Gen.Random (X, Last));
+  28 .:    end loop;
+  29 .: 
+  30 .: end Ada_SPARK_Workflow.Word_Search.Shuffle;

@@ -1,0 +1,50 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-tests.ads:
+0% of 3 lines covered
+0% statement coverage (0 out of 3)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                          A U N I T . T E S T S                           --
+   6 .: --                                                                          --
+   7 .: --                                 S p e c                                  --
+   8 .: --                                                                          --
+   9 .: --                     Copyright (C) 2000-2011, AdaCore                     --
+  10 .: --                                                                          --
+  11 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  12 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  13 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  14 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  15 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  16 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  17 .: --                                                                          --
+  18 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  19 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  20 .: -- version 3.1, as published by the Free Software Foundation.               --
+  21 .: --                                                                          --
+  22 .: -- You should have received a copy of the GNU General Public License and    --
+  23 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  24 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  25 .: -- <http://www.gnu.org/licenses/>.                                          --
+  26 .: --                                                                          --
+  27 .: -- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+  28 .: --                                                                          --
+  29 .: ------------------------------------------------------------------------------
+  30 .: 
+  31 .: --  Base Test Case or Test Suite
+  32 .: --
+  33 .: --  This base type allows composition of both test cases and sub-suites into a
+  34 .: --  test suite (Composite pattern)
+  35 .: 
+  36 .: package AUnit.Tests is
+  37 .: 
+  38 -:    type Test is abstract tagged limited private;
+  39 -:    type Test_Access is access all Test'Class;
+  40 .: 
+  41 .: private
+  42 .: 
+  43 -:    type Test is abstract tagged limited null record;
+  44 .: 
+  45 .: end AUnit.Tests;

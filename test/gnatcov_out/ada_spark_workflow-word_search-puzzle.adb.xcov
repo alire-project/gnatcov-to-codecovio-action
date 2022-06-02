@@ -1,0 +1,282 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/src/ada_spark_workflow-word_search-puzzle.adb:
+99% of 101 lines covered
+99% statement coverage (100 out of 101)
+
+Coverage level: stmt
+   1 .: with Ada.Text_IO;
+   2 .: with Ada.Integer_Text_IO;
+   3 .: with Ada.Strings.Fixed;
+   4 .: 
+   5 .: with Ada_SPARK_Workflow.Word_Search.RNG;
+   6 .: 
+   7 .: package body Ada_SPARK_Workflow.Word_Search.Puzzle
+   8 .: with SPARK_Mode
+   9 .: is
+  10 .: 
+  11 .:    ------------
+  12 .:    -- Create --
+  13 .:    ------------
+  14 .: 
+  15 .:    procedure Create (This : in out Instance;
+  16 .:                      Dict : in out Dictionary.Instance)
+  17 .:    is
+  18 +:       Success : Boolean;
+  19 .:    begin
+  20 +:       Dict.Random_Shuffle;
+  21 .: 
+  22 +:       while not Dict.Is_Empty loop
+  23 .: 
+  24 .:          declare
+  25 +:             W : Word.Instance;
+  26 .:          begin
+  27 +:             Dict.Pop_Last (W);
+  28 +:             This.Add_Word (W, Success);
+  29 .:          end;
+  30 .: 
+  31 +:          exit when Success
+  32 +:            and then not This.Empty_Cells
+  33 +:            and then This.Complete;
+  34 .: 
+  35 .:       end loop;
+  36 .: 
+  37 +:       This.Fill_Empty;
+  38 .:    end Create;
+  39 .: 
+  40 .:    -----------------
+  41 .:    -- Empty_Cells --
+  42 .:    -----------------
+  43 .: 
+  44 .:    function Empty_Cells (This : Instance) return Boolean is
+  45 .:    begin
+  46 +:       for X in This.Grid'Range (1) loop
+  47 +:          for Y in This.Grid'Range (2) loop
+  48 +:             if This.Grid (X, Y) = Empty_Cell then
+  49 +:                return True;
+  50 .:             end if;
+  51 .:          end loop;
+  52 .:       end loop;
+  53 .: 
+  54 -:       return False;
+  55 .:    end Empty_Cells;
+  56 .: 
+  57 .:    --------------
+  58 .:    -- Add_Word --
+  59 .:    --------------
+  60 .: 
+  61 .:    procedure Add_Word (This    : in out Instance;
+  62 .:                        W       :        Word.Instance;
+  63 .:                        Success :    out Boolean)
+  64 .:    is
+  65 .:       generic
+  66 .:          type T is (<>);
+  67 .:       function Next_Gen (Val : T) return T;
+  68 .: 
+  69 .:       --------------
+  70 .:       -- Next_Gen --
+  71 .:       --------------
+  72 .: 
+  73 .:       function Next_Gen (Val : T) return T is
+  74 .:       begin
+  75 +:          return (if Val = T'Last
+  76 +:                  then T'First
+  77 +:                  else T'Succ (Val));
+  78 .:       end Next_Gen;
+  79 .: 
+  80 +:       subtype Coord_X is Positive range This.Grid'Range (1);
+  81 +:       subtype Coord_Y is Positive range This.Grid'Range (2);
+  82 .: 
+  83 +:       package Rand_X_Pck is new RNG (Coord_X);
+  84 +:       package Rand_Y_Pck is new RNG (Coord_Y);
+  85 +:       package Rand_Dir_Pck is new RNG (Direction);
+  86 .: 
+  87 +:       function Next_X is new Next_Gen (Coord_X);
+  88 +:       function Next_Y is new Next_Gen (Coord_Y);
+  89 +:       function Next_Dir is new Next_Gen (Direction);
+  90 .: 
+  91 +:       Gen_X      : constant Rand_X_Pck.Instance := Rand_X_Pck.Create;
+  92 +:       First_X    : constant Coord_X := Gen_X.Random;
+  93 +:       X          : Coord_X := First_X;
+  94 .: 
+  95 +:       Gen_Y      : constant Rand_Y_Pck.Instance := Rand_Y_Pck.Create;
+  96 +:       First_Y    : constant Coord_Y := Gen_Y.Random;
+  97 +:       Y          : Coord_Y := First_Y;
+  98 .: 
+  99 +:       Gen_Dir    : constant Rand_Dir_Pck.Instance  := Rand_Dir_Pck.Create;
+ 100 +:       First_Dir  : constant Direction := Gen_Dir.Random;
+ 101 +:       Dir        : Direction := First_Dir;
+ 102 .:    begin
+ 103 .: 
+ 104 +:       if This.Complete then
+ 105 .:          --  No more room
+ 106 +:          Success := False;
+ 107 +:          return;
+ 108 .:       end if;
+ 109 .: 
+ 110 .:       --  Try all direction and positions, starting from random direction and
+ 111 .:       --  position.
+ 112 .: 
+ 113 .:       loop
+ 114 .:          pragma Loop_Invariant (This.Used_Count < This.Max_Words);
+ 115 .:          loop
+ 116 .:             pragma Loop_Invariant (This.Used_Count < This.Max_Words);
+ 117 .:             loop
+ 118 .:                pragma Loop_Invariant (This.Used_Count < This.Max_Words);
+ 119 .: 
+ 120 +:                This.Try_Set_Word (W, X, Y, Dir, Success);
+ 121 .: 
+ 122 +:                if Success or else This.Complete then
+ 123 +:                   return;
+ 124 .:                end if;
+ 125 .: 
+ 126 +:                X := Next_X (X);
+ 127 +:                exit when X = First_X;
+ 128 .:             end loop;
+ 129 .: 
+ 130 +:             Y := Next_Y (Y);
+ 131 +:             exit when Y = First_Y;
+ 132 .:          end loop;
+ 133 .: 
+ 134 +:          Dir := Next_Dir (Dir);
+ 135 +:          exit when Dir = First_Dir;
+ 136 .:       end loop;
+ 137 .: 
+ 138 .:    end Add_Word;
+ 139 .: 
+ 140 .:    -----------
+ 141 .:    -- Print --
+ 142 .:    -----------
+ 143 .: 
+ 144 .:    procedure Print (This : Instance) is
+ 145 .:       use Ada.Text_IO;
+ 146 .:       use Ada.Integer_Text_IO;
+ 147 .:       use Ada.Strings.Fixed;
+ 148 .: 
+ 149 +:       Int_Width : constant := 3;
+ 150 .: 
+ 151 +:       Title_Len : constant Positive := 3 + Int_Width * This.Grid'Length (1);
+ 152 .: 
+ 153 .:    begin
+ 154 +:       Put_Line (Head ("--- Puzzle ", Title_Len, '-'));
+ 155 .: 
+ 156 +:       Put ("   ");
+ 157 +:       for X in This.Grid'Range (1) loop
+ 158 +:          Put (X, Int_Width);
+ 159 .:       end loop;
+ 160 +:       New_Line;
+ 161 .: 
+ 162 +:       for Y in This.Grid'Range (2) loop
+ 163 +:          Put (Y, Int_Width);
+ 164 +:          Put ("  ");
+ 165 .: 
+ 166 +:          for X in This.Grid'Range (1) loop
+ 167 +:             Put (This.Grid (X, Y) & "  ");
+ 168 .:          end loop;
+ 169 .: 
+ 170 +:          New_Line;
+ 171 .:       end loop;
+ 172 .:    end Print;
+ 173 .: 
+ 174 .:    --------------
+ 175 .:    -- Solution --
+ 176 .:    --------------
+ 177 .: 
+ 178 .:    function Solution (This : Instance) return Word_Search.Solution.Instance
+ 179 +:    is (This.Sol);
+ 180 .: 
+ 181 .:    ------------------
+ 182 .:    -- Try_Set_Word --
+ 183 .:    ------------------
+ 184 .: 
+ 185 .:    procedure Try_Set_Word (This    : in out Instance;
+ 186 .:                            W       :        Word.Instance;
+ 187 .:                            XS, YS  :        Positive;
+ 188 .:                            Dir     :        Direction;
+ 189 .:                            Success :    out Boolean)
+ 190 .:    is
+ 191 .: 
+ 192 +:       DX : constant Integer := (case Dir is
+ 193 +:                                    when North | South => 0,
+ 194 +:                                    when North_East | East | South_East  => 1,
+ 195 +:                                    when South_West | West | North_West => -1);
+ 196 .: 
+ 197 +:       DY : constant Integer := (case Dir is
+ 198 +:                                    when East | West => 0,
+ 199 +:                                    when North | North_East | North_West => -1,
+ 200 +:                                    when South | South_East | South_West => 1);
+ 201 .: 
+ 202 +:       Str : constant String := W.To_Str;
+ 203 .: 
+ 204 +:       XE : constant Integer := XS + Str'Length * DX;
+ 205 +:       YE : constant Integer := YS + Str'Length * DY;
+ 206 .: 
+ 207 +:       X : Positive := XS;
+ 208 +:       Y : Positive := YS;
+ 209 .:    begin
+ 210 .: 
+ 211 .:       --  Check bounds
+ 212 +:       if Str'Length = 0
+ 213 +:         or else
+ 214 +:          XE not in This.Grid'Range (1)
+ 215 +:         or else
+ 216 +:          YE not in This.Grid'Range (2)
+ 217 .:       then
+ 218 .:          --  Word doesn't fit in grid
+ 219 +:          Success := False;
+ 220 +:          return;
+ 221 .:       end if;
+ 222 .: 
+ 223 .:       --  Check if word can be placed in the grid at given position and
+ 224 .:       --  direction.
+ 225 +:       for Count in 0 .. Str'Length - 1 loop
+ 226 .:          pragma Loop_Invariant (X = XS + Count * DX);
+ 227 .:          pragma Loop_Invariant (Y = YS + Count * DY);
+ 228 .: 
+ 229 +:          if This.Grid (X, Y) not in Str (Str'First + Count) | Empty_Cell
+ 230 .:          then
+ 231 .:             --  Conflict with word already in the grid
+ 232 +:             Success := False;
+ 233 +:             return;
+ 234 .:          end if;
+ 235 .: 
+ 236 +:          X := X + DX;
+ 237 +:          Y := Y + DY;
+ 238 .:       end loop;
+ 239 .: 
+ 240 .:       --  If we reach this point, the word fits in grid
+ 241 .: 
+ 242 .:       --  Place the word
+ 243 +:       X := XS;
+ 244 +:       Y := YS;
+ 245 +:       for Count in 0 .. Str'Length - 1 loop
+ 246 .:          pragma Loop_Invariant (X = XS + Count * DX);
+ 247 .:          pragma Loop_Invariant (Y = YS + Count * DY);
+ 248 .: 
+ 249 +:          This.Grid (X, Y) := Str (Str'First + Count);
+ 250 +:          X := X + DX;
+ 251 +:          Y := Y + DY;
+ 252 .:       end loop;
+ 253 .: 
+ 254 +:       Word_Search.Solution.Add_Word (This.Sol, W, XS, YS, XE, YE);
+ 255 +:       Success := True;
+ 256 .:    end Try_Set_Word;
+ 257 .: 
+ 258 .:    ----------------
+ 259 .:    -- Fill_Empty --
+ 260 .:    ----------------
+ 261 .: 
+ 262 .:    procedure Fill_Empty (This : in out Instance) is
+ 263 +:       subtype Valid_Char is Character range 'a' .. 'z';
+ 264 .: 
+ 265 +:       package Rand_Char_Pck is new RNG (Valid_Char);
+ 266 .: 
+ 267 +:       Gen : constant Rand_Char_Pck.Instance := Rand_Char_Pck.Create;
+ 268 .:    begin
+ 269 .: 
+ 270 +:       for C of This.Grid loop
+ 271 +:          if C = Empty_Cell then
+ 272 +:             C := Gen.Random;
+ 273 .:          end if;
+ 274 .:       end loop;
+ 275 .:    end Fill_Empty;
+ 276 .: 
+ 277 .: end Ada_SPARK_Workflow.Word_Search.Puzzle;

@@ -1,0 +1,40 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/src/ada_spark_workflow-word_search-word.adb:
+63% of 8 lines covered
+63% statement coverage (5 out of 8)
+
+Coverage level: stmt
+   1 .: package body Ada_SPARK_Workflow.Word_Search.Word
+   2 .: with SPARK_Mode
+   3 .: is
+   4 .: 
+   5 .:    ------------
+   6 .:    -- Create --
+   7 .:    ------------
+   8 .: 
+   9 .:    function Create (Str : String) return Instance is
+  10 .:    begin
+  11 +:       return This : Instance do
+  12 +:          This.Len := Str'Length;
+  13 +:          This.Str := (others => ASCII.NUL);
+  14 +:          This.Str (1 .. This.Len) := Str;
+  15 .:       end return;
+  16 .:    end Create;
+  17 .: 
+  18 .:    ---------
+  19 .:    -- "=" --
+  20 .:    ---------
+  21 .: 
+  22 .:    overriding
+  23 .:    function "=" (A, B : Instance) return Boolean
+  24 -:    is (A.Len = B.Len
+  25 -:        and then
+  26 -:        A.Str (1 .. A.Len) = B.Str (1 .. B.Len));
+  27 .: 
+  28 .:    ------------
+  29 .:    -- To_Str --
+  30 .:    ------------
+  31 .: 
+  32 .:    function To_Str (This : Instance) return String
+  33 +:    is (This.Str (1 .. This.Len));
+  34 .: 
+  35 .: end Ada_SPARK_Workflow.Word_Search.Word;

@@ -1,0 +1,118 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-simple_test_cases.adb:
+0% of 14 lines covered
+0% statement coverage (0 out of 14)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                A U N I T . S I M P L E _ T E S T _ C A S E S             --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                        Copyright (C) 2008-2012, AdaCore                  --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: with AUnit.Assertions;   use AUnit.Assertions;
+  33 .: with AUnit.Options;      use AUnit.Options;
+  34 .: with AUnit.Test_Filters; use AUnit.Test_Filters;
+  35 .: 
+  36 .: package body AUnit.Simple_Test_Cases is
+  37 .: 
+  38 .:    procedure Run_Routine
+  39 .:      (Test    : access Test_Case'Class;
+  40 .:       Options :        AUnit_Options;
+  41 .:       R       : in out Result'Class;
+  42 .:       Outcome :    out Status);
+  43 .:    --  Run one test routine
+  44 .: 
+  45 .:    -----------------
+  46 .:    -- Run_Routine --
+  47 .:    -----------------
+  48 .: 
+  49 .:    procedure Run_Routine
+  50 .:      (Test    : access Test_Case'Class;
+  51 .:       Options :        AUnit_Options;
+  52 .:       R       : in out Result'Class;
+  53 .:       Outcome :    out Status) is separate;
+  54 .: 
+  55 .:    ------------------
+  56 .:    -- Routine_Name --
+  57 .:    ------------------
+  58 .: 
+  59 .:    function Routine_Name (Test : Test_Case) return Message_String is
+  60 .:       pragma Unreferenced (Test);
+  61 .:    begin
+  62 -:       return null;
+  63 .:    end Routine_Name;
+  64 .: 
+  65 .:    ------------
+  66 .:    -- Set_Up --
+  67 .:    ------------
+  68 .: 
+  69 .:    procedure Set_Up (Test : in out Test_Case) is
+  70 .:       pragma Unreferenced (Test);
+  71 .:    begin
+  72 -:       null;
+  73 .:    end Set_Up;
+  74 .: 
+  75 .:    ---------------
+  76 .:    -- Tear_Down --
+  77 .:    ---------------
+  78 .: 
+  79 .:    procedure Tear_Down (Test : in out Test_Case) is
+  80 .:       pragma Unreferenced (Test);
+  81 .:    begin
+  82 -:       null;
+  83 .:    end Tear_Down;
+  84 .: 
+  85 .:    ---------
+  86 .:    -- Run --
+  87 .:    ---------
+  88 .: 
+  89 .:    procedure Run
+  90 .:      (Test    : access Test_Case;
+  91 .:       Options :        AUnit_Options;
+  92 .:       R       : in out Result'Class;
+  93 .:       Outcome :    out Status)
+  94 .:    is
+  95 -:       Old : constant Test_Access := AUnit.Assertions.Current_Test;
+  96 .:    begin
+  97 -:       Outcome := Success;
+  98 -:       if Options.Filter = null
+  99 -:         or else Is_Active (Options.Filter.all, Test.all)
+ 100 .:       then
+ 101 -:          AUnit.Assertions.Set_Current_Test (Test_Access (Test));
+ 102 -:          Init_Test (Test.all);
+ 103 -:          Start_Test (R, 1);
+ 104 .: 
+ 105 .:          --  Run test routine
+ 106 -:          Set_Up (Test_Case'Class (Test.all));
+ 107 -:          Run_Routine (Test, Options, R, Outcome);
+ 108 -:          Tear_Down (Test_Case'Class (Test.all));
+ 109 -:          AUnit.Assertions.Set_Current_Test (Old);
+ 110 .:       end if;
+ 111 .:    end Run;
+ 112 .: 
+ 113 .: end AUnit.Simple_Test_Cases;

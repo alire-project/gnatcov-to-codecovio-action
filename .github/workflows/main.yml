@@ -1,0 +1,21 @@
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  self_test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./ # Uses an action in the root directory
+        with:
+          fail_ci_if_error: false
+          verbose: true

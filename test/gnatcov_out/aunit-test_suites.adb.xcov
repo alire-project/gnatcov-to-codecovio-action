@@ -1,0 +1,121 @@
+/home/chouteau/src/github/alire/ada_spark_workflow/tests/alire/cache/dependencies/aunit_22.0.0_cbd7a80a/include/aunit/framework/aunit-test_suites.adb:
+0% of 26 lines covered
+0% statement coverage (0 out of 26)
+
+Coverage level: stmt
+   1 .: ------------------------------------------------------------------------------
+   2 .: --                                                                          --
+   3 .: --                         GNAT COMPILER COMPONENTS                         --
+   4 .: --                                                                          --
+   5 .: --                    A U N I T . T E S T _ S U I T E S                     --
+   6 .: --                                                                          --
+   7 .: --                                 B o d y                                  --
+   8 .: --                                                                          --
+   9 .: --                                                                          --
+  10 .: --                       Copyright (C) 2000-2011, AdaCore                   --
+  11 .: --                                                                          --
+  12 .: -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+  13 .: -- terms of the  GNU General Public License as published  by the Free Soft- --
+  14 .: -- ware  Foundation;  either version 3,  or (at your option) any later ver- --
+  15 .: -- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+  16 .: -- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+  17 .: -- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
+  18 .: --                                                                          --
+  19 .: -- As a special exception under Section 7 of GPL version 3, you are granted --
+  20 .: -- additional permissions described in the GCC Runtime Library Exception,   --
+  21 .: -- version 3.1, as published by the Free Software Foundation.               --
+  22 .: --                                                                          --
+  23 .: -- You should have received a copy of the GNU General Public License and    --
+  24 .: -- a copy of the GCC Runtime Library Exception along with this program;     --
+  25 .: -- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+  26 .: -- <http://www.gnu.org/licenses/>.                                          --
+  27 .: --                                                                          --
+  28 .: -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+  29 .: --                                                                          --
+  30 .: ------------------------------------------------------------------------------
+  31 .: 
+  32 .: with Ada.Unchecked_Conversion;
+  33 .: with AUnit.Memory.Utils;
+  34 .: 
+  35 .: package body AUnit.Test_Suites is
+  36 .: 
+  37 .:    --------------
+  38 .:    -- Add_Test --
+  39 .:    --------------
+  40 .: 
+  41 .:    procedure Add_Test
+  42 .:      (S : access Test_Suite'Class;
+  43 .:       T : access Test_Suite'Class)
+  44 .:    is
+  45 .:    begin
+  46 -:       Append
+  47 -:         (S.Tests,
+  48 -:          (Kind => TS_Elt,
+  49 -:           TS   => Access_Test_Suite'(T.all'Unchecked_Access)));
+  50 .:    end Add_Test;
+  51 .: 
+  52 .:    --------------
+  53 .:    -- Add_Test --
+  54 .:    --------------
+  55 .: 
+  56 .:    procedure Add_Test
+  57 .:      (S : access Test_Suite'Class;
+  58 .:       T : access Test_Case'Class)
+  59 .:    is
+  60 .:    begin
+  61 -:       Append
+  62 -:         (S.Tests,
+  63 -:          (Kind => TC_Elt,
+  64 -:           TC   => Test_Case_Access'(T.all'Unchecked_Access)));
+  65 .:    end Add_Test;
+  66 .: 
+  67 .:    ---------
+  68 .:    -- Run --
+  69 .:    ---------
+  70 .: 
+  71 .:    procedure Run (Suite   : access Test_Suite;
+  72 .:                   Options :        AUnit_Options;
+  73 .:                   R       : in out Result'Class;
+  74 .:                   Outcome :    out Status)
+  75 .:    is
+  76 -:       C      : Cursor := First (Suite.Tests);
+  77 -:       Result : Status := Success;
+  78 .: 
+  79 .:    begin
+  80 -:       Outcome := Success;
+  81 -:       while Has_Element (C) loop
+  82 -:          case Element (C).Kind is
+  83 .:             when TC_Elt =>
+  84 -:                Run (Element (C).TC, Options, R, Result);
+  85 .:             when TS_Elt =>
+  86 -:                Run (Element (C).TS, Options, R, Result);
+  87 .:          end case;
+  88 .: 
+  89 -:          if Result = Failure then
+  90 -:             Outcome := Failure;
+  91 .:          end if;
+  92 .: 
+  93 -:          Next (C);
+  94 .:       end loop;
+  95 .:    end Run;
+  96 .: 
+  97 .:    ---------------
+  98 .:    -- New_Suite --
+  99 .:    ---------------
+ 100 .: 
+ 101 .:    function New_Suite return Access_Test_Suite is
+ 102 -:       type Access_Type is access all Test_Suite;
+ 103 .:       pragma No_Strict_Aliasing (Access_Type);
+ 104 -:       function Alloc is new AUnit.Memory.Utils.Gen_Alloc
+ 105 -:         (Test_Suite, Access_Type);
+ 106 -:       function Convert is new Ada.Unchecked_Conversion
+ 107 -:         (Access_Type, Access_Test_Suite);
+ 108 -:       Ret : constant Access_Type := Alloc;
+ 109 -:       Obj : Test_Suite;
+ 110 .:       for Obj'Address use Ret.all'Address;
+ 111 .:       pragma Warnings (Off, Obj);
+ 112 .:    begin
+ 113 -:       return Convert (Ret);
+ 114 .:    end New_Suite;
+ 115 .: 
+ 116 .: end AUnit.Test_Suites;
