@@ -1,9 +1,0 @@
-/home/chouteau/src/github/alire/ada_spark_workflow/src/ada_spark_workflow-resources.ads:
-no code
-no code
-Coverage level: stmt
-   1 .: with Resources;
-   2 .: with Ada_Spark_Workflow_Config;
-   3 .: 
-   4 .: package Ada_SPARK_Workflow.Resources
-   5 .: is new Standard.Resources (Ada_Spark_Workflow_Config.Crate_Name);

@@ -42,4 +42,3 @@ for file in $(find . -type f -name '*.xcov'); do
     tail -n +${gnatcov_header_lines} ${file} | sed "${sed_rules}" >> ${gcov_file}
 done
 unset IFS
-s
