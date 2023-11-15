@@ -4,6 +4,9 @@ inputs:
   token:
     description: 'Repository upload token - get it from codecov.io. Required only for private repositories'
     required: false
+  branch:
+    description: 'Override branch, if using other than the default branch'
+    required: false
   fail_ci_if_error:
     description: 'Specify whether or not CI build should fail if Codecov runs into an error during upload'
     required: false
@@ -23,5 +26,6 @@ runs:
     - uses: codecov/codecov-action@v2
       with:
         token: ${{ inputs.token }}
+        override_branch: ${{ inputs.branch }}
         verbose: ${{ inputs.verbose }}
         fail_ci_if_error: ${{ inputs.fail_ci_if_error }}
